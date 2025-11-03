@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { API_BASE_URL } from "../config"; 
 
 function QueryExecutor({ token }) {
   const [connectionId, setConnectionId] = useState(localStorage.getItem("connectedConnectionId") || "");
   const [connectionName, setConnectionName] = useState(localStorage.getItem("connectedConnectionName") || "");
   const [connectionStatus, setConnectionStatus] = useState(localStorage.getItem("connectionStatus") || "");
   const [isConnected, setIsConnected] = useState(!!localStorage.getItem("connectedConnectionId"));
+  
 
   const [articulos, setArticulos] = useState([]);
   const [filtered, setFiltered] = useState([]);
@@ -12,17 +14,26 @@ function QueryExecutor({ token }) {
   const [message, setMessage] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [codLocal, setCodLocal] = useState("");
   const itemsPerPage = 20;
 
   // 🔹 Detectar cambios de conexión (en tiempo real)
   useEffect(() => {
+    //const codLocal = localStorage.getItem("codLocal")|| "";
+    //const user = JSON.parse(localStorage.getItem("authUser"));
+
     const updateConnection = () => {
       /*const id = localStorage.getItem("connectedConnectionId") || "";
       const name = localStorage.getItem("connectedConnectionName") || "";*/
       const newId = localStorage.getItem("connectedConnectionId") || "";
       const newName = localStorage.getItem("connectedConnectionName") || "";
       const status = localStorage.getItem("connectionStatus") || "";
+      const storedUser = JSON.parse(localStorage.getItem("authUser"));
+      const storedCodLocal = localStorage.getItem("codLocal");
 
+      setCurrentUser(storedUser);
+      setCodLocal(storedCodLocal);
       setConnectionId(newId);
       setConnectionName(newName);
       setConnectionStatus(status);
@@ -49,7 +60,7 @@ function QueryExecutor({ token }) {
     setLoading(true);
     setMessage("Cargando artículos...");
     try {
-      const res = await fetch(`http://localhost:3000/query/articulos/${connectionId}`, {
+      const res = await fetch(`${API_BASE_URL}/query/articulos/${connectionId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -77,7 +88,7 @@ function QueryExecutor({ token }) {
     const filteredData = articulos.filter(
       (a) =>
         a.Codigo.toString().toLowerCase().includes(term) ||
-        (a.Descrip && a.Descrip.toLowerCase().includes(term))
+        (a.Descrip && a.Observac.toLowerCase().includes(term))
     );
     setFiltered(filteredData);
     setCurrentPage(1);
@@ -89,18 +100,18 @@ function QueryExecutor({ token }) {
   const currentItems = filtered.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
-  const toggleWeb = async (codigo, currentWeb) => {
+  const toggleWeb = async (codigo, currentWeb,user,codLocal) => {
     const ok = window.confirm(`¿Confirma cambiar Web para artículo ${codigo} a ${currentWeb ? "OFF" : "ON"}?`);
     if (!ok) return;
     setMessage("Actualizando...");
     try {
-      const res = await fetch("http://localhost:3000/query/toggle-web", {
+      const res = await fetch(`${API_BASE_URL}/query/toggle-web`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ connectionId, codigo }),
+        body: JSON.stringify({ connectionId, codigo, username: user.full_name,codLocal}),
       });
       const data = await res.json();
       if (data.success) {
@@ -157,10 +168,10 @@ function QueryExecutor({ token }) {
           <thead>
             <tr>
               <th>Código</th>
-              <th>Descripción</th>
+              <th>Articulo</th>
               {/*<th>Precio</th>*/}
-              <th>Observación</th>
-              <th>Kioko</th>
+              <th>Descripción</th>
+              <th>Kiosko</th>
               {/*<th>Acción</th>*/}
             </tr>
           </thead>
@@ -178,7 +189,7 @@ function QueryExecutor({ token }) {
                   <td>{a.Observac}</td>
                   <td>
                     <button className={`btn btn-sm ${a.Web ? "btn-success" : "btn-danger"}`} 
-                      onClick={() => toggleWeb(a.Codigo, a.Web)} title={a.Web ? "Desactivar en Kioko" : "Activar en Kioko"}>
+                      onClick={() => toggleWeb(a.Codigo, a.Web, currentUser,codLocal)} title={a.Web ? "Desactivar en Kioko" : "Activar en Kioko"}>
                       {a.Web ? "ON" : "OFF"}
                     </button>
                   </td>

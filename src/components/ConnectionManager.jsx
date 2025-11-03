@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { API_BASE_URL } from "../config"; 
 
 function ConnectionManager({ token }) {
   const [connections, setConnections] = useState([]);
@@ -13,7 +14,7 @@ function ConnectionManager({ token }) {
     // ✅ Definir fetchConnections con useCallback
     const fetchConnections = useCallback(async () => {
       try {
-        const res = await fetch("http://localhost:3000/connections", {
+        const res = await fetch(`${API_BASE_URL}/connections`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Error al cargar conexiones");
@@ -43,7 +44,7 @@ function ConnectionManager({ token }) {
   const handleTestConnection = async (id) => {
     setMessage("⏳ Probando conexión...");
     try {
-      const res = await fetch(`http://localhost:3000/connections/test/${id}`, {
+      const res = await fetch(`${API_BASE_URL}/connections/test/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -55,6 +56,7 @@ function ConnectionManager({ token }) {
           localStorage.setItem("connectedConnectionId", id);
           localStorage.setItem("connectedConnectionName", connection.name || "");
           localStorage.setItem("connectionStatus", "OK");
+          localStorage.setItem("codLocal",  connection.codLocal);
           setConnectedId(String(id));
           window.dispatchEvent(new Event("storage"));
         }
@@ -81,7 +83,7 @@ function ConnectionManager({ token }) {
     }
 
     try {
-      const res = await fetch(`http://localhost:3000/connections/by-codlocal/${value}`, {
+      const res = await fetch(`${API_BASE_URL}/connections/by-codlocal/${value}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -110,7 +112,7 @@ function ConnectionManager({ token }) {
   // ➕ Crear nueva conexión
   const addConnection = async () => {
     try {
-      const res = await fetch("http://localhost:3000/connections", {
+      const res = await fetch(`${API_BASE_URL}/connections`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -131,7 +133,7 @@ function ConnectionManager({ token }) {
   // 💾 Actualizar conexión existente
   const updateConnection = async () => {
     try {
-      const res = await fetch(`http://localhost:3000/connections/${form.id}`, {
+      const res = await fetch(`${API_BASE_URL}/connections/${form.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -153,7 +155,7 @@ function ConnectionManager({ token }) {
   const deleteConnection = async () => {
     if (!window.confirm("¿Seguro que deseas eliminar esta conexión?")) return;
     try {
-      const res = await fetch(`http://localhost:3000/connections/${form.id}`, {
+      const res = await fetch(`${API_BASE_URL}/connections/${form.id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

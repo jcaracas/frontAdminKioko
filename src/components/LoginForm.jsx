@@ -1,5 +1,6 @@
 // src/components/LoginForm.jsx
 import React, { useState } from "react";
+import { API_BASE_URL } from "../config"; 
 
 function LoginForm({ onLogin }) {
   const [username, setUsername] = useState("");
@@ -14,7 +15,7 @@ function LoginForm({ onLogin }) {
 
     try {
       // 🔹 Aquí deberías poner la URL real de tu backend de login
-      const res = await fetch("http://localhost:3000/auth/login", {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -23,13 +24,18 @@ function LoginForm({ onLogin }) {
       if (!res.ok) throw new Error("Credenciales incorrectas");
 
       const data = await res.json();
-
+      
+      
       // 🔹 Guarda token y usuario en localStorage
       localStorage.setItem("authToken", data.token);
-      localStorage.setItem("authUser", data.username);
+      localStorage.setItem("authUser", data.user);
+      
+      
+
+      
 
       // 🔹 Llama al callback del App.jsx
-      onLogin(data.token, data.username);
+      onLogin(data.token, data.user);
     } catch (err) {
       setError("❌ Usuario o contraseña inválidos");
     } finally {
