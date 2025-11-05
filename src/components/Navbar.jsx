@@ -7,8 +7,7 @@ function Navbar({ user, onLogout }) {
 
   // Accedemos directamente a la prop 'user' que viene de App.jsx
   const role = user?.role;
-  const userName = user?.full_name; // Asumimos que el objeto user tiene la propiedad 'name'
-
+  
   const handleLogout = () => {
     onLogout();
     navigate("/");

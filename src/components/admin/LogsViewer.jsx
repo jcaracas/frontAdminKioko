@@ -19,30 +19,23 @@ function LogsViewer({ token }) {
       
       const maxRetries = 3;
       let res = null;
-      let attempt = 0;
 
-      // Se usa un bucle do/while más simple para la lógica de reintento.
-      do {
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
           res = await fetch(`${API_BASE_URL}/logs${qs}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
-          
-          if (res.ok) break; // Sale del bucle si es exitoso
-          
+
+          if (res.ok) break;
+
         } catch (err) {
-          // Si hay un error de red y no es el último intento, espera y reintenta
           if (attempt < maxRetries - 1) {
-            // Se usa el valor de 'attempt' de la iteración actual, lo cual es seguro aquí.
             await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
           } else {
-            // Lanza el error si es el último intento (error de conexión persistente)
             throw err; 
           }
         }
-        attempt++;
-      } while (attempt < maxRetries && (!res || !res.ok));
-      
+      }
       
       if (!res || !res.ok) {
         setMessage(`Error ${res ? res.status : 'desconocido'}: Fallo al cargar los registros después de ${maxRetries} intentos.`);

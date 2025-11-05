@@ -1,5 +1,5 @@
 // src/components/UsersManager.jsx
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { API_BASE_URL } from "../../config"; 
 
 const ROLES = ["Admin","N1","N2"];
@@ -12,22 +12,27 @@ function UsersManager({ token }) {
   const [form, setForm] = useState({ username: "", password: "", full_name: "", email: "", role: "N2" });
   const [message, setMessage] = useState("");
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/users`, {
-        method: "GET",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(`${API_BASE_URL}/users`, 
+        { method: "GET", headers: 
+          { Authorization: `Bearer ${token} `}, 
+        });
       const data = await res.json();
+  
       if (data.success) setUsers(data.data || []);
       else setMessage("Error cargando usuarios");
     } catch (err) {
-      setMessage("Error de conexión");
-    } finally { setLoading(false); }
-  };
-
-  useEffect(() => { fetchUsers(); }, []);
+      setMessage(`Error de conexión: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  }, [token]); // ✅ no dependencias porque obtienes token dentro de apiFetch
+  
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   const openCreate = () => {
     setEditing(null);

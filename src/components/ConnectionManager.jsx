@@ -1,5 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { API_BASE_URL } from "../config"; 
+import { apiFetch } from "./utils/api";
+import Select from "react-select";
 
 function ConnectionManager({ token }) {
   const [connections, setConnections] = useState([]);
@@ -10,16 +12,16 @@ function ConnectionManager({ token }) {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ name: "", host: "", codLocal: "" });
 
+  const user = JSON.parse(localStorage.getItem("authUser") || "{}");
+  const isAdmin = user.role === "Admin" || user.role === "N2";
+  
+
   // 🔹 Cargar lista
     // ✅ Definir fetchConnections con useCallback
     const fetchConnections = useCallback(async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/connections`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error("Error al cargar conexiones");
-        const data = await res.json();
-  
+        const data = await apiFetch("/connections");
+    
         // ordenar por codLocal si existe
         const sorted = [...data].sort((a, b) => {
           if (a.codLocal && b.codLocal) {
@@ -28,12 +30,13 @@ function ConnectionManager({ token }) {
           }
           return a.id - b.id;
         });
-  
+    
         setConnections(sorted);
+    
       } catch (err) {
         setMessage("❌ No se pudieron cargar las conexiones");
       }
-    }, [token]); // ✅ token como dependencia
+    }, []);
 
   // ✅ useEffect solo depende de fetchConnections
   useEffect(() => {
@@ -174,13 +177,24 @@ function ConnectionManager({ token }) {
       <h4 className="mb-3">Gestión de Conexiones</h4>
 
       <div className="mb-3">
-        <label className="form-label fw-bold">Seleccionar conexión:</label>
-        <select className="form-select" value={selected}
-          onChange={(e) => {
-            const id = e.target.value;
+      <label className="form-label fw-bold">Seleccionar conexión:</label>
+
+        <Select
+          options={connections.map(c => ({
+            value: c.id,
+            label: `${c.codLocal ? `${c.codLocal} — ` : ""}${c.name} (${c.host})`
+          }))}
+          placeholder="Selecciona o escribe para buscar..."
+          value={connections
+            .map(c => ({
+              value: c.id,
+              label: `${c.codLocal ? `${c.codLocal} — ` : ""}${c.name} (${c.host})`
+            }))
+            .find(opt => opt.value === selected) || null}
+          onChange={(opt) => {
+            const id = opt?.value;
             setSelected(id);
 
-            // 🧹 Limpia artículos cuando se cambia de conexión
             localStorage.setItem("connectedConnectionId", "");
             localStorage.setItem("connectedConnectionName", "");
             localStorage.setItem("connectionStatus", "PENDING");
@@ -188,15 +202,8 @@ function ConnectionManager({ token }) {
 
             if (id) handleTestConnection(id);
           }}
-        >
-          <option value="">-- Selecciona una conexión --</option>
-          {connections.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.codLocal ? `${c.codLocal} — ` : ""}
-              {c.name} ({c.host})
-            </option>
-          ))}
-        </select>
+        />
+
       </div>
 
       {message && (
@@ -213,14 +220,7 @@ function ConnectionManager({ token }) {
         </div>
       )}
 
-      {connectedId && (
-        <div className="mt-2">
-          <small className="text-success">
-            Conexión activa: ID {connectedId} —{" "}
-            {localStorage.getItem("connectedConnectionName")}
-          </small>
-        </div>
-      )}
+
 
       <hr />
       <h5>{editing ? "Editar conexión" : "Nueva conexión"}</h5>
@@ -251,19 +251,28 @@ function ConnectionManager({ token }) {
           />
 
           {!editing ? (
-            <button className="btn btn-success" onClick={addConnection}>
-              +
-            </button>
+            // NUEVA CONEXIÓN — solo admin puede crear
+            isAdmin && (
+              <button className="btn btn-success" onClick={addConnection}>
+                ➕ 
+              </button>
+            )
           ) : (
             <>
+              {/* Guardar — siempre disponible */}
               <button className="btn btn-warning" onClick={updateConnection}>
-                💾
+                💾 
               </button>
-              <button className="btn btn-danger" onClick={deleteConnection}>
-                🗑️
-              </button>
+
+              {/* Eliminar — solo admin */}
+              {isAdmin && (
+                <button className="btn btn-danger" onClick={deleteConnection}>
+                  🗑️ 
+                </button>
+              )}
             </>
           )}
+
         </div>
       </div>
 

@@ -5,6 +5,7 @@ import ConnectionManager from "./components/ConnectionManager";
 import QueryExecutor from "./components/QueryExecutor";
 import LoginForm from "./components/LoginForm";
 import AdminDashboard from "./components/admin/AdminDashboard";
+import { useAuthGuard } from './hooks/useAuthGuard';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -51,6 +52,9 @@ const FooterContent = () => (
 
 
 function App() {
+  // ✅ Aplica guardia
+  useAuthGuard();
+
   const [token, setToken] = useState(localStorage.getItem("authToken") || "");
   const [user, setUser] = useState(() => {
     try {
@@ -62,6 +66,7 @@ function App() {
     }
   });
 
+  
   const handleLogin = (newToken, newUser) => {
     localStorage.setItem("authToken", newToken);
     localStorage.setItem("authUser", JSON.stringify(newUser));
@@ -71,22 +76,25 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("authUser");
+    localStorage.removeItem("connectionStatus");
     setToken("");
     setUser(null);
     window.dispatchEvent(new Event("storage"));
   };
 
+
   if (!token) return <LoginForm onLogin={handleLogin} />;
 
   return (
-    <Router>
+    <>
       <Navbar user={user} onLogout={handleLogout} />
       <div className="container mt-4">
         <Layout token={token} />
       </div>
       <FooterContent />
-    </Router>
+    </>
   );
 }
 
