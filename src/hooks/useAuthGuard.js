@@ -5,27 +5,39 @@ import { jwtDecode } from "jwt-decode";
 export function useAuthGuard() {
   const navigate = useNavigate();
 
-  useEffect(() => {
+  const logout = () => {
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("authUser");
+    navigate("/login", { replace: true });
+  };
+
+  const checkAuth = () => {
     const token = localStorage.getItem("authToken");
-    
-    if (!token) {
-      navigate("/login", { replace: true });
-      return;
-    }
+    if (!token) return logout();
 
     try {
       const { exp } = jwtDecode(token);
       const now = Date.now() / 1000;
 
-      if (exp < now) {
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("authUser");
-        navigate("/login", { replace: true });
-      }
+      if (exp < now) logout();
     } catch {
-      localStorage.removeItem("authToken");
-      localStorage.removeItem("authUser");
-      navigate("/login", { replace: true });
+      logout();
     }
+  };
+
+  useEffect(() => {
+    // ✅ Check instantáneo
+    checkAuth();
+
+    // ✅ Check cada 20 segundos por si expira sin navegar
+    const interval = setInterval(checkAuth, 20000);
+
+    // ✅ Escuchar logout en otras pestañas
+    window.addEventListener("storage", checkAuth);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("storage", checkAuth);
+    };
   }, [navigate]);
 }

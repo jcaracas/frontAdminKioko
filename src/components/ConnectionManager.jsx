@@ -114,6 +114,11 @@ function ConnectionManager({ token }) {
 
   // ➕ Crear nueva conexión
   const addConnection = async () => {
+    // ✅ Validar campos obligatorios antes de enviar
+    if (!form.name.trim() || !form.host.trim() || !form.codLocal.trim()) {
+      setMessage("Todos los campos son obligatorios.");
+      return;
+    }
     try {
       const res = await fetch(`${API_BASE_URL}/connections`, {
         method: "POST",
@@ -127,6 +132,7 @@ function ConnectionManager({ token }) {
       setMessage(data.message || "Conexión agregada");
       setForm({ name: "", host: "", codLocal: "" });
       setEditing(false);
+      await fetchConnections(); // 🔄 Actualiza la lista del select
       window.dispatchEvent(new Event("storage"));
     } catch (err) {
       setMessage("❌ Error al agregar conexión");
@@ -148,6 +154,7 @@ function ConnectionManager({ token }) {
       setMessage(data.message || "Conexión actualizada");
       setEditing(false);
       setForm({ name: "", host: "", codLocal: "" });
+      await fetchConnections(); // 🔄 Actualiza la lista del select
       window.dispatchEvent(new Event("storage"));
     } catch (err) {
       setMessage("❌ Error al actualizar conexión");
@@ -166,6 +173,7 @@ function ConnectionManager({ token }) {
       setMessage(data.message || "Conexión eliminada");
       setEditing(false);
       setForm({ name: "", host: "", codLocal: "" });
+      await fetchConnections(); // 🔄 Actualiza la lista del select
       window.dispatchEvent(new Event("storage"));
     } catch (err) {
       setMessage("❌ Error al eliminar conexión");
@@ -231,6 +239,7 @@ function ConnectionManager({ token }) {
           <input
             type="text"
             className="form-control"
+            required
             placeholder="Nombre"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -238,6 +247,7 @@ function ConnectionManager({ token }) {
           <input
             type="text"
             className="form-control"
+            required
             placeholder="Host"
             value={form.host}
             onChange={(e) => setForm({ ...form, host: e.target.value })}
@@ -245,6 +255,7 @@ function ConnectionManager({ token }) {
           <input
             type="text"
             className="form-control"
+            required
             placeholder="Cod Local"
             value={form.codLocal}
             onChange={(e) => checkCodLocal(e.target.value)}
