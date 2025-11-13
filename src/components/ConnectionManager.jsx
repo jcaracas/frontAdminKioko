@@ -240,6 +240,14 @@ function ConnectionManager({ token }) {
             type="text"
             className="form-control"
             required
+            placeholder="Cod Local"
+            value={form.codLocal}
+            onChange={(e) => checkCodLocal(e.target.value)}
+          />
+          <input
+            type="text"
+            className="form-control"
+            required
             placeholder="Nombre"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -251,14 +259,6 @@ function ConnectionManager({ token }) {
             placeholder="Host"
             value={form.host}
             onChange={(e) => setForm({ ...form, host: e.target.value })}
-          />
-          <input
-            type="text"
-            className="form-control"
-            required
-            placeholder="Cod Local"
-            value={form.codLocal}
-            onChange={(e) => checkCodLocal(e.target.value)}
           />
 
           {!editing ? (
