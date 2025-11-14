@@ -120,7 +120,7 @@ function ReportsPanel({ token }) {
         <div className="row">
           <div className="col-12 mb-3">
             <div className="card mb-3">
-              <div className="card-header d-flex justify-content-between align-items-center">
+              <div className="card-header d-flex justify-content-between align-items-center ">
                 <strong>Desactivaciones agrupadas por día y local</strong>
                 <button
                   className="btn btn-sm btn-outline-success"
@@ -129,10 +129,10 @@ function ReportsPanel({ token }) {
                   Exportar Excel
                 </button>
               </div>
-              <div className="card-body p-2">
+              <div className="card-body p-0" >
                 <table className="table table-sm mb-0">
                   <thead>
-                    <tr>
+                    <tr className="table-secondary">
                       <th>Fecha</th>
                       <th>CodLocal</th>
                       <th>Local</th>

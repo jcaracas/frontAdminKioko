@@ -18,9 +18,9 @@ function Layout({ token }) {
       {!isAdminRoute && (
         <>
           <ConnectionManager token={token} />
-          <hr />
+
           <QueryExecutor token={token} />
-          <hr />
+
         </>
       )}
 

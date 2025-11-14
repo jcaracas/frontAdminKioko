@@ -166,7 +166,7 @@ function QueryExecutor({ token }) {
       <div className="table-responsive">
         <table className="table table-striped table-sm">
           <thead>
-            <tr>
+            <tr className="table-secondary">
               <th>Código</th>
               <th>Articulo</th>
               {/*<th>Precio</th>*/}

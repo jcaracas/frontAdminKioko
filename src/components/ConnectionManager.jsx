@@ -184,34 +184,34 @@ function ConnectionManager({ token }) {
     <div className="card p-4 shadow-sm">
       <h4 className="mb-3">Gestión de Conexiones</h4>
 
-      <div className="mb-3">
-      <label className="form-label fw-bold">Seleccionar conexión:</label>
+      <div className="d-flex gap-4 align-items-center">
+        <label className="form-label fw-bold">Seleccionar Conexión:</label>
 
-        <Select
-          options={connections.map(c => ({
-            value: c.id,
-            label: `${c.codLocal ? `${c.codLocal} — ` : ""}${c.name} (${c.host})`
-          }))}
-          placeholder="Selecciona o escribe para buscar..."
-          value={connections
-            .map(c => ({
+          <Select
+            className="flex-grow-1"
+            options={connections.map(c => ({
               value: c.id,
               label: `${c.codLocal ? `${c.codLocal} — ` : ""}${c.name} (${c.host})`
-            }))
-            .find(opt => opt.value === selected) || null}
-          onChange={(opt) => {
-            const id = opt?.value;
-            setSelected(id);
+            }))}
+            placeholder="Selecciona o escribe para buscar..."
+            value={connections
+              .map(c => ({
+                value: c.id,
+                label: `${c.codLocal ? `${c.codLocal} — ` : ""}${c.name} (${c.host})`
+              }))
+              .find(opt => opt.value === selected) || null}
+            onChange={(opt) => {
+              const id = opt?.value;
+              setSelected(id);
 
-            localStorage.setItem("connectedConnectionId", "");
-            localStorage.setItem("connectedConnectionName", "");
-            localStorage.setItem("connectionStatus", "PENDING");
-            window.dispatchEvent(new Event("storage"));
+              localStorage.setItem("connectedConnectionId", "");
+              localStorage.setItem("connectedConnectionName", "");
+              localStorage.setItem("connectionStatus", "PENDING");
+              window.dispatchEvent(new Event("storage"));
 
-            if (id) handleTestConnection(id);
-          }}
-        />
-
+              if (id) handleTestConnection(id);
+            }}
+          />
       </div>
 
       {message && (
@@ -234,7 +234,7 @@ function ConnectionManager({ token }) {
       <h5>{editing ? "Editar conexión" : "Nueva conexión"}</h5>
 
       {/* 🆕 Formulario de Nueva Conexión */}
-      <div className="border-top pt-3 mt-3">
+      <div className="pt-1 mt-1">
         <div className="d-flex gap-2">
           <input
             type="text"
@@ -264,20 +264,20 @@ function ConnectionManager({ token }) {
           {!editing ? (
             // NUEVA CONEXIÓN — solo admin puede crear
             isAdmin && (
-              <button className="btn btn-success" onClick={addConnection}>
+              <button className="btn btn-success" onClick={addConnection} title="Guardar Nuevo Local">
                 ➕ 
               </button>
             )
           ) : (
             <>
               {/* Guardar — siempre disponible */}
-              <button className="btn btn-warning" onClick={updateConnection}>
+              <button className="btn btn-warning" onClick={updateConnection} title="Actualizar Local">
                 💾 
               </button>
 
               {/* Eliminar — solo admin */}
               {isAdmin && (
-                <button className="btn btn-danger" onClick={deleteConnection}>
+                <button className="btn btn-danger" onClick={deleteConnection} title="Eliminar Local">
                   🗑️ 
                 </button>
               )}
@@ -286,9 +286,6 @@ function ConnectionManager({ token }) {
 
         </div>
       </div>
-
-
-      <hr />
       
     </div>
   );

@@ -93,11 +93,11 @@ function UsersManager({ token }) {
 
 
       {message && <div className="alert alert-info">{message}</div>}
-      <div className="card-body">
+      <div className="card-body p-0">
         <div className="table-responsive">
-          <table className="table table-sm table-striped">
-            <thead>
-              <tr>
+          <table className="table table-hover table-sm mb-0">
+            <thead className="sticky-top bg-white shadow-sm">
+              <tr className="table-secondary">
                 <th>User</th><th>Nombre</th><th>Email</th><th>Role</th><th>Creado</th><th>Acción</th>
               </tr>
             </thead>

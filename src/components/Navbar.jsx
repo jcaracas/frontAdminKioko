@@ -24,7 +24,7 @@ function Navbar({ user, onLogout }) {
                 e.target.style.display = 'none'; 
                 console.error("No se pudo cargar la imagen del logo.");
                 }}
-            /> BD Manager
+            /> Manager Kiosko
         </Link>
 
         <button
