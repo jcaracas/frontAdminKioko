@@ -1,8 +1,9 @@
 // src/components/UsersManager.jsx
 import React, { useCallback, useEffect, useState } from "react";
 import { API_BASE_URL } from "../../config"; 
+import AsignarZonalModal from "./AsignarZonalModal";
 
-const ROLES = ["Admin","N1","N2"];
+const ROLES = ["Admin","N1","N2","Local","Comercial","Zonal"];
 
 function UsersManager({ token }) {
   const [users, setUsers] = useState([]);
@@ -11,6 +12,8 @@ function UsersManager({ token }) {
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({ username: "", password: "", full_name: "", email: "", role: "N2" });
   const [message, setMessage] = useState("");
+  const [showModalAsignar, setShowModalAsignar] = useState(false);
+  const [user, setUser] = useState(null);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -81,14 +84,15 @@ function UsersManager({ token }) {
     } catch (err) { setMessage("Error al eliminar"); }
   };
 
+  
+
   return (
     <div className="card shadow-sm">
       <div className="card-header d-flex justify-content-between align-items-center">
         <h5 className="mb-0">Administración de Usuarios</h5>
         <div>
           <button className="btn btn-sm btn-success me-2" onClick={openCreate}>Nuevo usuario</button>
-          <button className="btn btn-sm btn-outline-secondary" onClick={fetchUsers}>Actualizar</button>
-        </div>
+          </div>
       </div>
 
 
@@ -98,7 +102,7 @@ function UsersManager({ token }) {
           <table className="table table-hover table-sm mb-0">
             <thead className="sticky-top bg-white shadow-sm">
               <tr className="table-secondary">
-                <th>User</th><th>Nombre</th><th>Email</th><th>Role</th><th>Creado</th><th>Acción</th>
+                <th>User</th><th>Nombre</th><th>Role</th><th>Acción</th>
               </tr>
             </thead>
             <tbody>
@@ -106,12 +110,14 @@ function UsersManager({ token }) {
                 <tr key={u.id}>
                   <td>{u.username}</td>
                   <td>{u.full_name}</td>
-                  <td>{u.email}</td>
                   <td>{u.role}</td>
-                  <td>{new Date(u.created_at).toLocaleString()}</td>
                   <td>
                     <button className="btn btn-sm btn-outline-primary me-2" onClick={() => openEdit(u)}>Editar</button>
-                    <button className="btn btn-sm btn-outline-danger" onClick={() => remove(u.id)}>Eliminar</button>
+                    <button className="btn btn-sm btn-outline-danger me-2" onClick={() => remove(u.id)}>Eliminar</button>
+                    <button className="btn btn-sm btn-outline-info" onClick={() => 
+                      { setUser(u.id);
+                        setShowModalAsignar(true)}}
+                      >Asignar Local</button>
                   </td>
                 </tr>
               ))}
@@ -159,6 +165,15 @@ function UsersManager({ token }) {
               </form>
             </div>
           </div>
+      )}
+
+      {showModalAsignar && (
+        <AsignarZonalModal 
+          token={token} 
+          dataUser={user}
+          onClose={() => {setShowModalAsignar(false); setUser(null);}} 
+          onSaved={fetchUsers}
+        />
       )}
       </div>
     </div>

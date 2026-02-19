@@ -7,6 +7,7 @@ function ConnectionManager({ token }) {
   const [connections, setConnections] = useState([]);
   const [selected, setSelected] = useState("");
   const [message, setMessage] = useState("");
+  const [showAlert, setShowAlert] = useState(false);
   const [connectedId, setConnectedId] = useState(localStorage.getItem("connectedConnectionId") || "");
   // 🧩 Formulario de nueva conexión / edición
   const [editing, setEditing] = useState(null);
@@ -180,6 +181,16 @@ function ConnectionManager({ token }) {
     }
   };
 
+  useEffect(() => {
+    if (!message) return;
+
+    const timer = setTimeout(() => {
+      setMessage("");
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }, [message]);
+
   return (
     <div className="card p-4 shadow-sm">
       <h4 className="mb-3">Gestión de Conexiones</h4>
@@ -226,6 +237,7 @@ function ConnectionManager({ token }) {
         >
           {message}
         </div>
+        
       )}
 
 

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import UserManagement from "./UsersManager";
 import Reports from "./ReportsPanel";
 import Logs from "./LogsViewer";
+import VentasDistribuidasView from "./VentasDistribuidasView";
 
 function AdminDashboard({ token }) {
   const [activeTab, setActiveTab] = useState("users");
@@ -12,6 +13,7 @@ function AdminDashboard({ token }) {
       case "users": return <UserManagement token={token} />;
       case "reports": return <Reports token={token} />;
       case "logs": return <Logs token={token} />;
+      case "ventas": return <VentasDistribuidasView token={token}/>;
       default: return null;
     }
   };
@@ -37,6 +39,12 @@ function AdminDashboard({ token }) {
           <button className={`nav-link ${activeTab === "logs" ? "active" : ""}`}
             onClick={() => setActiveTab("logs")}>
             Logs del Sistema
+          </button>
+        </li>
+        <li className="nav-item">
+          <button className={`nav-link ${activeTab === "ventas" ? "active" : ""}`}
+            onClick={() => setActiveTab("ventas")}>
+            Ventas Diarias
           </button>
         </li>
       </ul>

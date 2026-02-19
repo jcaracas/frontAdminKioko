@@ -6,19 +6,22 @@ function LogsViewer({ token }) {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [userFilter, setUserFilter] = useState("");
+  const [localFilter, setLocalFilter] = useState("");
   const [message, setMessage] = useState("");
+  
 
   // 1. Usamos useCallback para estabilizar loadLogs y depender de los filtros.
   const loadLogs = useCallback(async () => {
     try {
       let q = [];
       if (dateFrom) q.push(`date_from=${dateFrom}`);
-      if (dateTo) q.push(`date_to=${dateTo}`);
-      if (userFilter) q.push(`user=${encodeURIComponent(userFilter)}`);
+      if (userFilter) q.push(`userFilter=${userFilter}`);
+      if (localFilter) q.push(`localFilter=${localFilter}`);
       const qs = q.length ? `?${q.join("&")}` : "";
       
       const maxRetries = 3;
       let res = null;
+      
 
       for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
@@ -54,7 +57,7 @@ function LogsViewer({ token }) {
       setMessage("Error de conexión con el servidor.");
       setLogs([]);
     }
-  }, [token, dateFrom, dateTo, userFilter]); // 2. Dependencias de useCallback
+  }, [token, dateFrom, dateTo, userFilter, localFilter]); // 2. Dependencias de useCallback
 
   // 3. useEffect ahora depende de loadLogs. Esto resolverá la advertencia
   // y, gracias a useCallback, recargará los datos cada vez que cambie un filtro.
@@ -76,23 +79,23 @@ function LogsViewer({ token }) {
       <div className="card-body">
         <div className="row g-2 mb-3 align-items-end">
           <div className="col-md-3">
-            <label className="form-label small text-muted">Desde Fecha</label>
+            <label className="form-label small text-muted">Fecha</label>
             <input type="date" className="form-control form-control-sm" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
-          </div>
-          <div className="col-md-3">
-            <label className="form-label small text-muted">Hasta Fecha</label>
-            <input type="date" className="form-control form-control-sm" value={dateTo} onChange={(e) => setDateTo(e.target.value)} />
           </div>
           <div className="col-md-4">
             <label className="form-label small text-muted">Usuario</label>
             <input placeholder="Filtrar por usuario" className="form-control form-control-sm" value={userFilter} onChange={(e) => setUserFilter(e.target.value)} />
           </div>
+          <div className="col-md-4">
+            <label className="form-label small text-muted">Local</label>
+            <input placeholder="Filtrar por local" className="form-control form-control-sm" value={localFilter} onChange={(e) => setLocalFilter(e.target.value)} />
+          </div>
           <div className="col-md-2 d-grid">
             {/* El botón Filtrar ya no es tan necesario ya que el useEffect recarga
-                automáticamente al cambiar los campos, pero lo mantenemos para recarga manual. */}
+                automáticamente al cambiar los campos, pero lo mantenemos para recarga manual. 
             <button className="btn btn-primary btn-sm" onClick={loadLogs}>
               <i className="bi bi-search"></i> Filtrar
-            </button>
+            </button>*/}
           </div>
         </div>
 

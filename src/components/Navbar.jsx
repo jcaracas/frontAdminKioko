@@ -24,23 +24,21 @@ function Navbar({ user, onLogout }) {
                 e.target.style.display = 'none'; 
                 console.error("No se pudo cargar la imagen del logo.");
                 }}
-            /> Manager Kiosko
+            /> Manager Crack
         </Link>
 
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
+        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         >
           <span className="navbar-toggler-icon"></span>
         </button>
 
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-            <li className="nav-item">
-              <Link className="nav-link" to="/">Panel de Gestion</Link>
-            </li>
+            {role !== "Comercial" && role !== "Zonal" && (
+              <li className="nav-item">
+                <Link className="nav-link" to="/">Panel de Gestion</Link>
+              </li>
+            )}
 
             {role === "Admin" && (
                 <li className="nav-item">
@@ -49,6 +47,14 @@ function Navbar({ user, onLogout }) {
                     </button>
                 </li>
                 )}
+            {(role === "Admin" || role === "Comercial" || role === "Zonal") && (
+                <><li className="nav-item">
+                  <button className="nav-link btn btn-link" onClick={() => navigate("/menu-locales")}>
+                    Menú Local
+                  </button>
+                </li>
+                </>
+            )}
           </ul>
 
           <span className="navbar-text me-3 text-light">

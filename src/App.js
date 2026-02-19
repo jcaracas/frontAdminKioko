@@ -1,37 +1,88 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation
+} from "react-router-dom";
+
 import Navbar from "./components/Navbar";
 import ConnectionManager from "./components/ConnectionManager";
 import QueryExecutor from "./components/QueryExecutor";
 import LoginForm from "./components/LoginForm";
 import AdminDashboard from "./components/admin/AdminDashboard";
-import { useAuthGuard } from './hooks/useAuthGuard';
+import DashMenu from "./components/pages/DashMenu";
+import Articulos from "./components/articles/ArticlesPage";
+import ProtectedByRole from "./components/ProtectedByRole";
+import { useAuthGuard } from "./hooks/useAuthGuard";
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-function Layout({ token }) {
+/* -------------------- LAYOUT -------------------- */
+
+function Layout({ token, user }) {
   const location = useLocation();
-  const isAdminRoute = location.pathname.startsWith("/admin");
+
+  const MANAGEMENT_ROUTES = ["/admin", "/menu-locales"];
+
+  const isManagementView = MANAGEMENT_ROUTES.some((path) =>
+    location.pathname.startsWith(path)
+  );
+
+  const isOperationalUser = ["Admin", "N1", "N2"].includes(user?.role);
 
   return (
     <>
-      {!isAdminRoute && (
+      {/* OPERACIÓN: SOLO CUANDO LA RUTA LO PERMITE */}
+      {!isManagementView && isOperationalUser && (
         <>
           <ConnectionManager token={token} />
-
           <QueryExecutor token={token} />
-
         </>
       )}
 
       <Routes>
         <Route path="/" element={null} />
-        <Route path="/admin" element={<AdminDashboard token={token} />} />
+
+        {/* ADMIN */}
+        <Route
+          path="/admin/*"
+          element={
+            user?.role === "Admin"
+              ? <AdminDashboard token={token} />
+              : <Navigate to="/" />
+          }
+        />
+
+        {/* MENU POR LOCAL */}
+        <Route
+          path="/menu-locales"
+          element={
+            <ProtectedByRole user={user} roles={["Admin", "Comercial", "Zonal"]}>
+              <DashMenu token={token} role={user?.role} />
+            </ProtectedByRole>
+          }
+        />
+
+        {/* ARTÍCULOS */}
+        <Route
+          path="/articulos"
+          element={
+            <ProtectedByRole user={user} roles={["Admin", "Comercial"]}>
+              <Articulos token={token} />
+            </ProtectedByRole>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </>
   );
 }
+
+/* -------------------- FOOTER -------------------- */
 
 const FooterContent = () => (
   <footer className="bg-light text-center p-2 mt-3 border-top">
@@ -41,14 +92,14 @@ const FooterContent = () => (
   </footer>
 );
 
-function App() {
+/* -------------------- APP -------------------- */
 
+function App() {
   const [token, setToken] = useState(localStorage.getItem("authToken") || "");
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem("authUser");
-      if (!saved || saved === "undefined") return null;
-      return JSON.parse(saved);
+      return saved ? JSON.parse(saved) : null;
     } catch {
       return null;
     }
@@ -62,15 +113,12 @@ function App() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("authUser");
-    localStorage.removeItem("connectionStatus");
+    localStorage.clear();
     setToken("");
     setUser(null);
     window.dispatchEvent(new Event("storage"));
   };
 
-  // ✅ Solo usar guardia SI HAY token
   useAuthGuard();
 
   return (
@@ -81,7 +129,7 @@ function App() {
         <>
           <Navbar user={user} onLogout={handleLogout} />
           <div className="container mt-4">
-            <Layout token={token} />
+            <Layout token={token} user={user} />
           </div>
           <FooterContent />
         </>
