@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { API_BASE_URL } from "../../config"; 
 import AsignarZonalModal from "./AsignarZonalModal";
+import MobileActions from "../utils/MobileActions";
 
 const ROLES = ["Admin","N1","N2","Local","Comercial","Zonal"];
 
@@ -88,10 +89,10 @@ function UsersManager({ token }) {
 
   return (
     <div className="card shadow-sm">
-      <div className="card-header d-flex justify-content-between align-items-center">
+      <div className="card-header d-flex justify-content-between align-items-center gap-2 px-2">
         <h5 className="mb-0">Administración de Usuarios</h5>
         <div>
-          <button className="btn btn-sm btn-success me-2" onClick={openCreate}>Nuevo usuario</button>
+          <button className="btn btn-sm btn-success m-0" onClick={openCreate}>Nuevo <span className="d-none d-md-inline ms-1">Usuario</span></button>
           </div>
       </div>
 
@@ -101,8 +102,8 @@ function UsersManager({ token }) {
         <div className="table-responsive">
           <table className="table table-hover table-sm mb-0">
             <thead className="sticky-top bg-white shadow-sm">
-              <tr className="table-secondary">
-                <th>User</th><th>Nombre</th><th>Role</th><th>Acción</th>
+              <tr className="table-secondary ">
+                <th className="align-items-center">User</th><th>Nombre</th><th>Role</th><th className="text-center">Acción</th>
               </tr>
             </thead>
             <tbody>
@@ -111,13 +112,56 @@ function UsersManager({ token }) {
                   <td>{u.username}</td>
                   <td>{u.full_name}</td>
                   <td>{u.role}</td>
-                  <td>
-                    <button className="btn btn-sm btn-outline-primary me-2" onClick={() => openEdit(u)}>Editar</button>
-                    <button className="btn btn-sm btn-outline-danger me-2" onClick={() => remove(u.id)}>Eliminar</button>
-                    <button className="btn btn-sm btn-outline-info" onClick={() => 
-                      { setUser(u.id);
-                        setShowModalAsignar(true)}}
-                      >Asignar Local</button>
+                  <td className="text-center">
+                    <div className="d-flex justify-content-center align-items-center">
+
+                      {/* 🔹 DESKTOP */}
+                      <div className="d-none d-md-flex gap-2">
+
+                        <button className="btn btn-sm btn-outline-primary" onClick={() => openEdit(u)} >
+                          <i className="bi bi-pencil"></i>
+                          <span className="ms-1">Editar</span>
+                        </button>
+
+                        <button className="btn btn-sm btn-outline-danger" onClick={() => remove(u.id)} >
+                          <i className="bi bi-trash"></i>
+                          <span className="ms-1">Eliminar</span>
+                        </button>
+
+                        <button className="btn btn-sm btn-outline-info" onClick={() => {
+                            setUser(u.id); setShowModalAsignar(true);
+                          }} >
+                          <i className="bi bi-geo-alt"></i>
+                          <span className="ms-1">Asignar</span>
+                        </button>
+
+                      </div>
+
+                      {/* MOBILE */}
+                      <MobileActions
+                        actions={[
+                          {
+                            label: "Editar",
+                            icon: "bi bi-pencil",
+                            onClick: () => openEdit(u),
+                          },
+                          {
+                            label: "Eliminar",
+                            icon: "bi bi-trash text-danger",
+                            onClick: () => remove(u.id),
+                          },
+                          {
+                            label: "Asignar Local",
+                            icon: "bi bi-geo-alt text-primary",
+                            onClick: () => {
+                              setUser(u.id);
+                              setShowModalAsignar(true);
+                            },
+                          },
+                        ]}
+                      />
+
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -135,24 +179,24 @@ function UsersManager({ token }) {
                   <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
                 </div>
                 <div className="modal-body">
-                  <div className="mb-2">
-                    <label className="form-label">Usuario</label>
+                  <div className="d-flex flex-row mb-2 align-items-center gap-2">
+                    <label className="form-label mb-0 w-25">Usuario:</label>
                     <input className="form-control" value={form.username} onChange={(e) => setForm({...form, username: e.target.value})} required />
                   </div>
-                  <div className="mb-2">
-                    <label className="form-label">{editing ? "Cambiar contraseña (opcional)" : "Contraseña"}</label>
+                  <div className="d-flex flex-row mb-2 align-items-center gap-2">
+                    <label className="form-label mb-0 w-25">{editing ? "Cambiar contraseña (opcional)" : "Contraseña"}</label>
                     <input type="password" className="form-control" value={form.password} onChange={(e)=> setForm({...form, password: e.target.value})} />
                   </div>
-                  <div className="mb-2">
-                    <label className="form-label">Nombre completo</label>
+                  <div className="d-flex flex-row mb-2 align-items-center gap-2">
+                    <label className="form-label mb-0 w-25">Nombre:</label>
                     <input className="form-control" value={form.full_name} onChange={(e)=> setForm({...form, full_name: e.target.value})} />
                   </div>
-                  <div className="mb-2">
-                    <label className="form-label">Email</label>
+                  <div className="d-flex flex-row mb-2 align-items-center gap-2">
+                    <label className="form-label mb-0 w-25">Email:</label>
                     <input type="email" className="form-control" value={form.email} onChange={(e)=> setForm({...form, email: e.target.value})} />
                   </div>
-                  <div className="mb-2">
-                    <label className="form-label">Role</label>
+                  <div className="d-flex flex-row mb-2 align-items-center gap-2">
+                    <label className="form-label mb-0 w-25">Role:</label>
                     <select className="form-select" value={form.role} onChange={(e)=> setForm({...form, role: e.target.value})}>
                       {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>

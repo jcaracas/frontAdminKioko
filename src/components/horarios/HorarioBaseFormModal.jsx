@@ -21,9 +21,7 @@ export default function HorarioBaseFormModal({ token, show, onClose, onSaved, lo
   const [loading, setLoading] = useState(false);
   const [cerrado, setCerrado] = useState(false);
 
-  /* =========================
-     CARGA DE LOCALES
-  ========================== */
+  /* CARGA DE LOCALES */
   useEffect(() => {
     //if (!show) return;
     fetch(`${API_BASE_URL}/connections`, {
@@ -52,9 +50,7 @@ export default function HorarioBaseFormModal({ token, show, onClose, onSaved, lo
   };
 
 
-  /* =========================
-     HANDLERS
-  ========================== */
+  /* HANDLERS */
   const toggleDia = (dia) => {
     setDias(prev =>
       prev.includes(dia) ? prev.filter(d => d !== dia) : [...prev, dia]
@@ -77,9 +73,7 @@ export default function HorarioBaseFormModal({ token, show, onClose, onSaved, lo
     }
   };
 
-  /* =========================
-     GUARDAR
-  ========================== */
+  /* GUARDAR */
   const handleSubmit = async () => {
     if (!dias.length || !selectedLocales.length) {
       alert("Debe seleccionar días y locales");
@@ -169,7 +163,7 @@ export default function HorarioBaseFormModal({ token, show, onClose, onSaved, lo
             <div className="modal-body">
 
               {/* DÍAS */}
-              <div className="mb-3">
+              <div className="mb-2">
                 <label className="form-label fw-bold">Días de la Semana</label>
                 <div className="d-flex flex-wrap gap-2">
                   {DIAS.map(d => (
@@ -194,24 +188,14 @@ export default function HorarioBaseFormModal({ token, show, onClose, onSaved, lo
 
               {/* HORAS */}
               {!cerrado && (
-                <div className="row mb-3">
-                  <div className="col">
-                    <label className="form-label">Hora Apertura</label>
-                    <input
-                      type="time"
-                      className="form-control"
-                      value={horaApertura}
-                      onChange={e => setHoraApertura(e.target.value)}
-                    />
-                  </div>
-                  <div className="col">
-                    <label className="form-label">Hora Cierre</label>
-                    <input
-                      type="time"
-                      className="form-control"
-                      value={horaCierre}
-                      onChange={e => setHoraCierre(e.target.value)}
-                    />
+                <div className="row mb-2">
+                  <div className="d-flex justify-content-start gap-3 mb-2 align-items-center">
+                    <label className="form-label mb-0">Hora Apertura: </label>
+                    <input type="time" className="form-control w-25" value={horaApertura}
+                      onChange={e => setHoraApertura(e.target.value)} />
+                    <label className="form-label mb-0">Hora Cierre: </label>
+                    <input type="time" className="form-control w-25" value={horaCierre}
+                      onChange={e => setHoraCierre(e.target.value)} />
                   </div>
                 </div>
               )}

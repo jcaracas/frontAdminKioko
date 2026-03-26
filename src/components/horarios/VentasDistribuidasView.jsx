@@ -29,51 +29,28 @@ function VentasDistribuidasView({token}) {
 
   return (
     <div className="container-fluid mt-0 p-0">
-      <h4 className="mb-3">📊 Conciliación Local vs Central</h4>
+      <h4 className="mb-3">📊 Conciliación Ventas Local vs Central</h4>
 
       <div className="table-responsive">
-        <table className="table table-bordered table-sm align-middle">
-          
+        <table className="table table-bordered table-sm">
           <thead className="table-light">
             <tr>
               <th>Local</th>
-              <th className="text-end">Local $</th>
-              <th className="text-end d-none d-md-table-cell">Central $</th>
-              <th className="text-end">Diferencia</th>
+              <th>Local $</th>
+              <th>Central $</th>
+              <th>Diferencia</th>
               <th>Estado</th>
             </tr>
           </thead>
-
           <tbody>
             {data.map(l => (
               <tr key={l.codLocal}>
-
-                {/* 🔹 LOCAL + CENTRAL EN MOBILE */}
-                <td>
-                  <div className="fw-semibold">{l.name}</div>
-
-                  {/* Mobile: mostrar central como secundario */}
-                  <div className="d-md-none text-muted small">
-                    Central: ${l.central.total.toLocaleString("es-CL")}
-                  </div>
-                </td>
-
-                {/* 🔹 LOCAL */}
-                <td className="text-end">
-                  ${l.local.total.toLocaleString("es-CL")}
-                </td>
-
-                {/* 🔹 CENTRAL SOLO DESKTOP */}
-                <td className="text-end d-none d-md-table-cell">
-                  ${l.central.total.toLocaleString("es-CL")}
-                </td>
-
-                {/* 🔹 DIFERENCIA */}
+                <td>{l.name}</td>
+                <td className="text-end">${l.local.total.toLocaleString("es-CL")}</td>
+                <td className="text-end">${l.central.total.toLocaleString("es-CL")}</td>
                 <td className="text-end fw-bold">
-                  ${l.diferencia.total.toLocaleString("es-CL")}
+                  ${(l.diferencia.total).toLocaleString("es-CL")}
                 </td>
-
-                {/* 🔹 ESTADO */}
                 <td>
                   {l.diferencia.total === 0 ? (
                     <span className="badge bg-success">OK</span>
@@ -81,11 +58,9 @@ function VentasDistribuidasView({token}) {
                     <span className="badge bg-danger">Diferencia</span>
                   )}
                 </td>
-
               </tr>
             ))}
           </tbody>
-
         </table>
       </div>
 

@@ -36,3 +36,34 @@
     transform: rotate(360deg);
   }
 }
+
+
+/* 🔥 Navbar overlay en mobile */
+@media (max-width: 991px) {
+
+  .navbar-collapse {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+
+    background: rgba(0, 0, 0, 0.85); /* transparencia */
+    backdrop-filter: blur(8px); /* efecto vidrio */
+
+    padding: 15px;
+    z-index: 999;
+
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+
+  .navbar-nav .nav-link {
+    color: white;
+    padding: 10px 0;
+    font-size: 16px;
+  }
+
+  .navbar-text {
+    color: #ddd !important;
+  }
+}

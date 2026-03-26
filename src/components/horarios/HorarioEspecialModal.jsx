@@ -67,11 +67,11 @@ export default function HorarioEspecialModal({ token, data, onClose, onSaved }) 
             <div className="modal-body">
                 <div className="row mb-2">
                     <div className="col">
-                        <input type="date" className="form-control mb-2" value={form.fecha}
+                        <input type="date" className="form-control mb-0" value={form.fecha} title="Seleccionar fecha"
                         onChange={e => setForm({ ...form, fecha: e.target.value })}
                         />
                     </div>
-                    <div className="form-check mb-2 col">
+                    <div className="form-check m-auto col">
                         <input type="checkbox" className="form-check-input" checked={form.cerrado}
                         onChange={e => setForm({ ...form, cerrado: e.target.checked })}
                         />
@@ -81,16 +81,16 @@ export default function HorarioEspecialModal({ token, data, onClose, onSaved }) 
               
 
               {!form.cerrado && (
-                <div className="row mb-3">
-                    <div className="col">
-                        <label className="form-label">Hora apertura</label>
-                        <input type="time" className="form-control mb-2" value={form.hora_apertura}
+                <div className="row mb-2">
+                    <div className="d-flex flex-row col align-items-center gap-2">
+                        <label className="form-label mb-0">Apertura:</label>
+                        <input type="time" className="form-control mb-0" value={form.hora_apertura}
                             onChange={e => setForm({ ...form, hora_apertura: e.target.value })}
                         />
                     </div>
-                    <div className="col">
-                        <label className="form-label">Hora cierre</label>
-                        <input type="time" className="form-control mb-2" value={form.hora_cierre}
+                    <div className="d-flex flex-row col align-items-center gap-2">
+                        <label className="form-label mb-0">Cierre:</label>
+                        <input type="time" className="form-control mb-0" value={form.hora_cierre}
                             onChange={e => setForm({ ...form, hora_cierre: e.target.value })}
                         />
                     </div>
@@ -111,7 +111,7 @@ export default function HorarioEspecialModal({ token, data, onClose, onSaved }) 
                 Guardar
               </button>
             </div>
-            <div key={dato?.[0]?.codlocal} className="mb-4 p-3">
+            <div key={dato?.[0]?.codlocal} className="mb-2 p-3 pt-0">
 
                 <table className="table table-sm">
                     <thead>

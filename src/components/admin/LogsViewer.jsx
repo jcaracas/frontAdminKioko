@@ -67,36 +67,30 @@ function LogsViewer({ token }) {
 
   return (
     <div className="card shadow-sm">
-      <div className="card-header d-flex justify-content-between align-items-center">
+      <div className="card-header d-flex justify-content-between align-items-center gap-2">
         <h5 className="mb-0">Historial / Logs de Auditoría</h5>
         <div>
-          <button className="btn btn-sm btn-outline-secondary me-2" onClick={loadLogs}>
-            <i className="bi bi-arrow-clockwise"></i> Refrescar
+          <button className="btn btn-sm btn-outline-secondary m-0" onClick={loadLogs}>
+            <i className="bi bi-arrow-clockwise"></i> <span className="d-none d-md-inline ms-1">Refrescar</span>
           </button>
         </div>
       </div>
 
       <div className="card-body">
-        <div className="row g-2 mb-3 align-items-end">
-          <div className="col-md-3">
-            <label className="form-label small text-muted">Fecha</label>
-            <input type="date" className="form-control form-control-sm" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
+        <div className="row g-2 mb-2 align-items-end ">
+          <div className="d-flex flex-row col-md-4 gap-1 align-items-center m-0 mb-1">
+            <label className="form-label small text-muted mb-0 " style={{ width: '20%' }}>Fecha:</label>
+            <input type="date" className="form-control form-control-sm w-50" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
           </div>
-          <div className="col-md-4">
-            <label className="form-label small text-muted">Usuario</label>
+          <div className="d-flex flex-row col-md-4 gap-1 align-items-center m-0 mb-1">
+            <label className="form-label small text-muted mb-0 w-25">Usuario:</label>
             <input placeholder="Filtrar por usuario" className="form-control form-control-sm" value={userFilter} onChange={(e) => setUserFilter(e.target.value)} />
           </div>
-          <div className="col-md-4">
-            <label className="form-label small text-muted">Local</label>
+          <div className="d-flex flex-row col-md-4 gap-1 align-items-center m-0">
+            <label className="form-label small text-muted mb-0 w-25">Local:</label>
             <input placeholder="Filtrar por local" className="form-control form-control-sm" value={localFilter} onChange={(e) => setLocalFilter(e.target.value)} />
           </div>
-          <div className="col-md-2 d-grid">
-            {/* El botón Filtrar ya no es tan necesario ya que el useEffect recarga
-                automáticamente al cambiar los campos, pero lo mantenemos para recarga manual. 
-            <button className="btn btn-primary btn-sm" onClick={loadLogs}>
-              <i className="bi bi-search"></i> Filtrar
-            </button>*/}
-          </div>
+          
         </div>
 
         {message && <div className="alert alert-warning small">{message}</div>}

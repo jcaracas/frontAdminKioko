@@ -1,73 +1,74 @@
-// src/components/Navbar.jsx
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, {useState} from "react";
+import { Navbar, Nav, Container, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
-function Navbar({ user, onLogout }) {
+
+function MyNavbar({ user, onLogout }) {
   const navigate = useNavigate();
-
-  // Accedemos directamente a la prop 'user' que viene de App.jsx
   const role = user?.role;
-  
+
   const handleLogout = () => {
     onLogout();
     navigate("/");
   };
 
+  const [expanded, setExpanded] = useState(false);
+
   return (
-    <nav className="navbar navbar-expand-lg bg-dark navbar-dark shadow-sm">
-      <div className="container-fluid">
-        <Link className="navbar-brand" to="/">
-            <img src="T.png" alt="Logo de BD Manager" style={{ height: '28px', width: 'auto', marginRight: '8px' }} 
-                //className="rounded"  Opcional: añade esquinas redondeadas
-                onError={(e) => { 
-                // Fallback en caso de que la URL no cargue
-                e.target.style.display = 'none'; 
-                console.error("No se pudo cargar la imagen del logo.");
-                }}
-            /> Manager Crack
-        </Link>
+    <Navbar bg="dark" variant="dark" expand="lg" className="shadow-sm position-relative"
+      expanded={expanded} onToggle={() => setExpanded(!expanded)}>
+      <Container fluid>
 
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+        <Navbar.Brand onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
+          <img
+            src="T.png"
+            alt="Logo"
+            style={{ height: "28px", marginRight: "8px" }}
+          />
+          Manager Crack
+        </Navbar.Brand>
 
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+        {/* 🔥 HAMBURGUESA */}
+        <Navbar.Toggle aria-controls="navbarNav" />
+
+        {/* 🔥 CONTENIDO COLAPSABLE */}
+        <Navbar.Collapse id="navbarNav">
+          <Nav className="me-auto">
+
             {role !== "Comercial" && role !== "Zonal" && (
-              <li className="nav-item">
-                <Link className="nav-link" to="/">Panel de Gestion</Link>
-              </li>
+              <Nav.Link onClick={() => {navigate("/"); setExpanded(false); }}>
+                Panel de Gestión
+              </Nav.Link>
             )}
 
             {role === "Admin" && (
-                <li className="nav-item">
-                    <button className="nav-link btn btn-link" onClick={() => navigate("/admin")}>
-                    Administración
-                    </button>
-                </li>
-                )}
-            {(role === "Admin" || role === "Comercial" || role === "Zonal") && (
-                <><li className="nav-item">
-                  <button className="nav-link btn btn-link" onClick={() => navigate("/menu-locales")}>
-                    Menú Local
-                  </button>
-                </li>
-                </>
+              <Nav.Link onClick={() => {navigate("/admin"); setExpanded(false); }}>
+                Administración
+              </Nav.Link>
             )}
-          </ul>
 
-          <span className="navbar-text me-3 text-light">
-            {user?.full_name} ({user?.role})
-          </span>
+            {(role === "Admin" || role === "Comercial" || role === "Zonal") && (
+              <Nav.Link onClick={() => {navigate("/menu-locales"); setExpanded(false); }}>
+                Menú Local
+              </Nav.Link>
+            )}
 
-          <button className="btn btn-outline-light btn-sm" onClick={handleLogout}>
-            Cerrar sesión
-          </button>
-        </div>
-      </div>
-    </nav>
+          </Nav>
+
+          <div className="d-flex align-items-center gap-2">
+            <span className="text-light">
+              {user?.full_name} ({user?.role})
+            </span>
+
+            <Button variant="outline-light" size="sm" onClick={handleLogout}>
+              Cerrar sesión
+            </Button>
+          </div>
+        </Navbar.Collapse>
+
+      </Container>
+    </Navbar>
   );
 }
 
-export default Navbar;
+export default MyNavbar;

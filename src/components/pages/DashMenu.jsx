@@ -1,8 +1,9 @@
 // src/components/AdminDashboard.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import ArticlesPage from "../articles/ArticlesPage";
 import MenuLocales from "./MenuLocales";
 import LocalHorariosBasePage from "../horarios/HorariosBasePage";
+import VentasDistribuidasView from "../horarios/VentasDistribuidasView";
 
 function DashMenu({ token, role }) {
   const isZonal = role === "Zonal";
@@ -11,20 +12,98 @@ function DashMenu({ token, role }) {
     isZonal ? "horarios-base" : "menu-locales"
   );
 
-  // ===============================
-  // Evitar tabs inválidas por rol
-  // ===============================
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [visibleCount, setVisibleCount] = useState(3);
+  const [open, setOpen] = useState(false);
+
+  const containerRef = useRef(null);
+  const dropdownRef = useRef(null);
+
+  /* ===============================
+     TABS SEGÚN ROL
+  =============================== */
+  const tabs = [
+    ...(!isZonal
+      ? [
+          { key: "menu-locales", label: "Menú Locales" },
+          { key: "articulos", label: "Artículos" },
+        ]
+      : []),
+    { key: "horarios-base", label: "Horarios" },
+    { key: "ventas", label: "Ventas Diarias" },
+  ];
+
+  /* ===============================
+     CONTROL RESPONSIVE
+  =============================== */
   useEffect(() => {
-    if (isZonal && activeTab !== "horarios-base") {
-      setActiveTab("horarios-base");
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  /* ===============================
+     VALIDACIÓN ZONAL
+  =============================== */
+  useEffect(() => {
+    const zonalTabs = ["horarios-base", "ventas"];
+    if (isZonal && !zonalTabs.includes(activeTab)) {
+      setActiveTab("ventas");
     }
   }, [isZonal, activeTab]);
 
-  const renderTab = () => {
-    if (isZonal) {
-      return <LocalHorariosBasePage token={token} />;
-    }
+  /* ===============================
+     CÁLCULO DINÁMICO MOBILE
+  =============================== */
+  useEffect(() => {
+    if (!isMobile) return;
 
+    const calculateTabs = () => {
+      if (!containerRef.current) return;
+
+      const width = containerRef.current.offsetWidth;
+      const tabWidth = 80;
+      const moreWidth = 60;
+
+      let count = Math.floor(width / tabWidth);
+
+      if (count < tabs.length) {
+        count = Math.floor((width - moreWidth) / tabWidth);
+      }
+
+      setVisibleCount(count > 0 ? count : 1);
+    };
+
+    calculateTabs();
+    window.addEventListener("resize", calculateTabs);
+
+    return () => window.removeEventListener("resize", calculateTabs);
+  }, [isMobile, tabs.length]);
+
+  const visibleTabs = tabs.slice(0, visibleCount);
+  const hiddenTabs = tabs.slice(visibleCount);
+
+  /* ===============================
+     CERRAR DROPDOWN
+  =============================== */
+  useEffect(() => {
+    const close = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, []);
+
+  /* ===============================
+     RENDER TABS
+  =============================== */
+  const renderTab = () => {
     switch (activeTab) {
       case "menu-locales":
         return <MenuLocales token={token} />;
@@ -32,54 +111,86 @@ function DashMenu({ token, role }) {
         return <ArticlesPage token={token} />;
       case "horarios-base":
         return <LocalHorariosBasePage token={token} />;
+      case "ventas":
+        return <VentasDistribuidasView token={token} />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="card p-4 shadow-sm">
-      <h3 className="mb-4">Administración</h3>
+    <div className="container-fluid p-0">
+      <h4 className="fw-bold mb-2">Administración de Locales</h4>
 
       {/* ===============================
-          MENÚ DE TABS
+          DESKTOP → Bootstrap Tabs
       =============================== */}
-      <ul className="nav nav-tabs mb-3">
-
-        {!isZonal && (
-          <>
-            <li className="nav-item">
+      {!isMobile && (
+        <ul className="nav nav-tabs mb-2">
+          {tabs.map((tab) => (
+            <li className="nav-item" key={tab.key}>
               <button
-                className={`nav-link ${activeTab === "menu-locales" ? "active" : ""}`}
-                onClick={() => setActiveTab("menu-locales")}
+                className={`nav-link ${
+                  activeTab === tab.key ? "active" : ""
+                }`}
+                onClick={() => setActiveTab(tab.key)}
               >
-                Menú Locales
+                {tab.label}
               </button>
             </li>
+          ))}
+        </ul>
+      )}
 
-            <li className="nav-item">
+      {/* ===============================
+          MOBILE → Tabs dinámicos
+      =============================== */}
+      {isMobile && (
+        <div className="tabs-line mb-3 gap-2" ref={containerRef}>
+          {visibleTabs.map((tab) => (
+            <button
+              key={tab.key}
+              className={`tab-line ${
+                activeTab === tab.key ? "active" : ""
+              }`}
+              onClick={() => setActiveTab(tab.key)}
+            >
+              {tab.label}
+            </button>
+          ))}
+
+          {hiddenTabs.length > 0 && (
+            <div className="dropdown-custom" ref={dropdownRef}>
               <button
-                className={`nav-link ${activeTab === "articulos" ? "active" : ""}`}
-                onClick={() => setActiveTab("articulos")}
+                className="tab-line more-btn"
+                onClick={() => setOpen((prev) => !prev)}
               >
-                Artículos
+                ...
               </button>
-            </li>
-          </>
-        )}
 
-        {/* ESTA SIEMPRE EXISTE */}
-        <li className="nav-item">
-          <button
-            className={`nav-link ${activeTab === "horarios-base" ? "active" : ""}`}
-            onClick={() => setActiveTab("horarios-base")}
-          >
-            Horarios Locales
-          </button>
-        </li>
-      </ul>
+              {open && (
+                <div className="dropdown-menu-custom">
+                  {hiddenTabs.map((tab) => (
+                    <div
+                      key={tab.key}
+                      className="dropdown-item-custom"
+                      onClick={() => {
+                        setActiveTab(tab.key);
+                        setOpen(false);
+                      }}
+                    >
+                      {tab.label}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
-      {renderTab()}
+      {/* CONTENIDO */}
+      <div >{renderTab()}</div>
     </div>
   );
 }

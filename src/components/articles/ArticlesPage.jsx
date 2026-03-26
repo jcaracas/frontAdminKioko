@@ -50,7 +50,7 @@ export default function ArticlesPage({ token }) {
   }, [fetchArticles]);
 
   return (
-    <div className="container mt-4">
+    <div className="card mt-0 p-3">
       
 
       <ArticlesFilters
@@ -60,6 +60,7 @@ export default function ArticlesPage({ token }) {
           setFilters(f);
         }}
         onCreate={() => setEditingArticle({})}
+        token={token}
       />
 
       <ArticlesTable

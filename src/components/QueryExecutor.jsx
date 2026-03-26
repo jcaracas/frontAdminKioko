@@ -100,10 +100,15 @@ function QueryExecutor({ token }) {
   const currentItems = filtered.slice(indexOfFirst, indexOfLast);
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
-  const toggleWeb = async (codigo, currentWeb,user,codLocal) => {
+  const toggleWeb = async (codigo, currentWeb,user,codLocal,nombre_articulo) => {
     const ok = window.confirm(`¿Confirma cambiar Web para artículo ${codigo} a ${currentWeb ? "OFF" : "ON"}?`);
     if (!ok) return;
     setMessage("Actualizando...");
+    
+    const nombreArticulo = nombre_articulo
+      .trim()
+      .replace(/\s+/g, " ");
+      
     try {
       const res = await fetch(`${API_BASE_URL}/query/toggle-web`, {
         method: "POST",
@@ -111,7 +116,7 @@ function QueryExecutor({ token }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ connectionId, codigo, username: user.full_name,codLocal}),
+        body: JSON.stringify({ connectionId, codigo, username: user.full_name,codLocal,nombreArticulo }),
       });
       const data = await res.json();
       if (data.success) {
@@ -189,7 +194,7 @@ function QueryExecutor({ token }) {
                   <td>{a.Observac}</td>
                   <td>
                     <button className={`btn btn-sm ${a.Web ? "btn-success" : "btn-danger"}`} 
-                      onClick={() => toggleWeb(a.Codigo, a.Web, currentUser,codLocal)} title={a.Web ? "Desactivar en Kioko" : "Activar en Kioko"}>
+                      onClick={() => toggleWeb(a.Codigo, a.Web, currentUser,codLocal,a.Descrip)} title={a.Web ? "Desactivar en Totem" : "Activar en Totem"}>
                       {a.Web ? "ON" : "OFF"}
                     </button>
                   </td>

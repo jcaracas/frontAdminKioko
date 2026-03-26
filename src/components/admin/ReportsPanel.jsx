@@ -5,7 +5,7 @@ import { API_BASE_URL } from "../../config"; // ajusta si lo tienes centralizado
 function ReportsPanel({ token }) {
   const [dateFrom, setDateFrom] = useState(() => {
     const d = new Date();
-    d.setDate(d.getDate() - 13); // últimos 14 días por defecto
+    d.setDate(d.getDate() - 6); // últimos 7 días por defecto
     return d.toISOString().slice(0, 10);
   });
 
@@ -16,7 +16,7 @@ function ReportsPanel({ token }) {
 
   const [limit, setLimit] = useState(10);
   const [loading, setLoading] = useState(false);
-  const [data, setData] = useState({ grouped: [] });
+  const [data, setData] = useState({ });
   const [message, setMessage] = useState("");
 
   // 🔹 useCallback para evitar warning de dependencia faltante
@@ -24,15 +24,15 @@ function ReportsPanel({ token }) {
     setLoading(true);
     try {
       const qs = `?date_from=${dateFrom}&date_to=${dateTo}`;
-      const res = await fetch(`${API_BASE_URL}/reports/incidence-by-day${qs}`, {
+      const res = await fetch(`${API_BASE_URL}/reports/agotados-resumen${qs}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const json = await res.json();
       if (!json.success) throw new Error();
-      setData({ grouped: json.data });
+      setData({ ...json.data });
       setMessage(""); // Limpia cualquier mensaje previo
     } catch (e) {
-      setData({ grouped: [] });
+      setData({  });
       setMessage("No se pudo obtener el reporte.");
     } finally {
       setLoading(false);
@@ -71,7 +71,7 @@ function ReportsPanel({ token }) {
   return (
     <div className="card shadow-sm">
       <div className="card-header d-flex justify-content-between align-items-center">
-        <h5 className="mb-0">Reportes — Incidencias OFF</h5>
+        <h5 className="mb-0">Reportes Agotados</h5>
         <div>
           <button
             className="btn btn-sm btn-outline-secondary me-2"
@@ -84,31 +84,22 @@ function ReportsPanel({ token }) {
       </div>
 
      <div className="card-body">
-      <div className="row g-2 mb-3">
-          <div className="col-auto">
-            <label className="form-label small">Desde</label>
-            <input
-              type="date"
-              className="form-control form-control-sm"
-              value={dateFrom}
+      <div className="row g-2 mb-1 ">
+          <div className="d-flex align-items-center col-auto gap-2">
+            <label className="form-label small mb-0">Desde</label>
+            <input type="date" className="form-control form-control-sm" value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
             />
           </div>
-          <div className="col-auto">
-            <label className="form-label small">Hasta</label>
-            <input
-              type="date"
-              className="form-control form-control-sm"
-              value={dateTo}
+          <div className="d-flex align-items-center col-auto gap-2">
+            <label className="form-label small mb-0">Hasta</label>
+            <input type="date" className="form-control form-control-sm" value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
             />
           </div>
-          <div className="col-auto">
-            <label className="form-label small">Top</label>
-            <input
-              type="number"
-              className="form-control form-control-sm"
-              value={limit}
+          <div className="d-flex align-items-center col-auto gap-2">
+            <label className="form-label small mb-0">Top</label>
+            <input type="number" className="form-control form-control-sm" value={limit}
               onChange={(e) => setLimit(e.target.value)}
               style={{ width: 80 }}
             />
@@ -118,44 +109,40 @@ function ReportsPanel({ token }) {
         {message && <div className="alert alert-warning">{message}</div>}
 
         <div className="row">
-          <div className="col-12 mb-3">
-            <div className="card mb-3">
+          <div className="col-12 mb-0 p-1">
+            <div className="card mb-0">
               <div className="card-header d-flex justify-content-between align-items-center ">
-                <strong>Desactivaciones agrupadas por día y local</strong>
+                <strong>Artículos agotados por local</strong>
                 <button
                   className="btn btn-sm btn-outline-success"
-                  onClick={() => exportXlsx("by_grouped")}
+                  onClick={() => exportXlsx(`Agotados`)}
                 >
-                  Exportar Excel
+                  <span className="d-none d-md-inline ms-1">Exportar</span> Excel
                 </button>
               </div>
-              <div className="card-body p-0" >
-                <table className="table table-sm mb-0">
+              {loading && <p>Cargando...</p>}
+              <div className="table-responsive">
+                <table className="table table-striped table-sm">
+
                   <thead>
-                    <tr className="table-secondary">
-                      <th>Fecha</th>
-                      <th>CodLocal</th>
+                    <tr>
                       <th>Local</th>
-                      <th>Artículos OFF</th>
-                      <th className="text-end">Total</th>
+                      <th>Fecha</th>
+                      <th>Artículo</th>
+                      <th>Veces</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {data.grouped?.map((r, idx) => (
-                      <tr key={idx}>
-                        <td>{new Date(r.fecha).toLocaleDateString()}</td>
-                        <td>{r.codLocal}</td>
-                        <td>{r.localName || "(sin nombre)"}</td>
-                        <td>{r.articulos}</td>
-                        <td className="text-end">{r.total_articulos}</td>
-                      </tr>
-                    ))}
-                    {(!data.grouped || data.grouped.length === 0) && (
-                      <tr>
-                        <td colSpan="5" className="text-center text-muted">
-                          Sin datos en el rango seleccionado
-                        </td>
-                      </tr>
+                    {Object.entries(data).map(([local, articulos]) =>
+                      articulos.map((a, index) => (
+                        <tr key={`${local}-${a.articuloCodigo}-${index}`}>
+                          {/* Mostrar local solo en primera fila */}
+                          <td>{index === 0 ? local : ""}</td>
+                          <td>{a.fecha}</td>
+                          <td>{a.nombre_articulo}</td>
+                          <td>{a.veces}</td>
+                        </tr>
+                      ))
                     )}
                   </tbody>
                 </table>
@@ -163,7 +150,6 @@ function ReportsPanel({ token }) {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

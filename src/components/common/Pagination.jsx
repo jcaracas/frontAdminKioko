@@ -5,7 +5,7 @@ export default function Pagination({ page, total, limit, onPageChange }) {
 
   return (
     <nav>
-      <ul className="pagination">
+      <ul className="pagination m-0 justify-content-center">
         {Array.from({ length: totalPages }).map((_, i) => (
           <li
             key={i}

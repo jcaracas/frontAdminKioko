@@ -152,7 +152,7 @@ export default function MenuLocales({ token }) {
   // RENDER
   // ===============================
   return (
-    <div className="container mt-4">
+    <div className="card mt-0 p-3 shadow-sm">
       <h3>Menú por Local</h3>
 
       {message && (
@@ -165,8 +165,8 @@ export default function MenuLocales({ token }) {
     )}
 
       {/* CONTROLES */}
-    <div className="row mb-3 justify-content-between">
-        <div className="col-md-4">
+    <div className="row mb-2 justify-content-between">
+        <div className="col-md-4 mb-1">
             <input  type="text" className="form-control" placeholder="Buscar por local..."
                 value={search} onChange={(e) => {
                     setSearch(e.target.value);
@@ -175,8 +175,8 @@ export default function MenuLocales({ token }) {
             />
         </div>
 
-        <div className="col-md-2">
-            <select className="form-select"  value={filterMenu}
+        <div className="d-flex gap-3 justify-content-star col-md-8 mb-1">
+            <select className="form-select" style={{ width: "75%", maxWidth: "200px" }} value={filterMenu}
                 onChange={(e) => {
                     setFilterMenu(e.target.value);
                     setPage(1);
@@ -186,22 +186,14 @@ export default function MenuLocales({ token }) {
                 <option value="B">Menú B</option>
                 <option value="CRITICO">Crítico</option>
             </select>
-        </div>
-
-        <div className="col-md-2">
-          <button className="btn btn-success"
+          <button className="btn btn-success" title="Exportar a Excel"
             onClick={exportExcel} >
             <i className="bi bi-file-earmark-excel"></i>{" "}
-            Exportar
+            <span className="d-none d-md-inline ms-1">Exportar</span>
           </button>
-        </div>
-
-        
-
-        <div className="col-md-2">
-          <button className="btn btn-primary" title="Agregar Menú origen a local"
+         <button className="btn btn-primary" title="Agregar Menú origen a local"
             onClick={() => setShowModal(true)}
-          > ➕ Agregar
+          >➕<span className="d-none d-md-inline ms-1">Agregar</span>
           </button>
         </div>
     </div>
@@ -210,17 +202,17 @@ export default function MenuLocales({ token }) {
     <table className="table table-striped">
         <thead>
           <tr className="table-secondary">
-            <th>Local</th>
-            <th>Menú Origen</th>
-            <th>Crítico</th>
+            <th>Nombre Local</th>
+            <th className="text-center">Menú Origen</th>
+            <th className="text-center">Crítico</th>
           </tr>
         </thead>
         <tbody>
             {paginatedLocales.map((l) => (
                 <tr key={l.codLocal}>
                     <td>{l.local}</td>
-                    <td>{l.menuOrigen || "—"}</td>
-                    <td>
+                    <td className="text-center">{l.menuOrigen || "—"}</td>
+                    <td className="text-center">
                         <input type="checkbox" checked={!!l.menuCritico}
                             onChange={(e) =>
                                 toggleCritico(l.codLocal, e.target.checked)

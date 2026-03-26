@@ -4,6 +4,7 @@ import HorarioEspecialModal from "./HorarioEspecialModal";
 import ZendeskTicketsView from "./ZendeskTicketsView";
 import Pagination from "../common/Pagination";
 import { API_BASE_URL } from "../../config";
+import MobileActions from "../utils/MobileActions";
 
 export default function HorariosBasePage({ token }) {
   const [horarios, setHorarios] = useState([]);
@@ -88,41 +89,36 @@ export default function HorariosBasePage({ token }) {
      Render
   =============================== */
   return (
-    <div className="card p-4 shadow-sm">
+    <div className="cardpad card p-3 shadow-sm ">
 
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between align-items-center mb-2 gap-2 mlocalfilter">
         <h4 className="mb-0">Horarios Base</h4>
-        <div className="d-flex gap-2">
-            <input type="text" className="form-control m-auto" placeholder="Buscar local..."
-            value={searchLocal}
-            onChange={(e) => {
+        <div className="d-flex gap-2 justify-content-end" >
+            <input type="text" className="form-control m-0" placeholder="Buscar local..."
+              value={searchLocal} onChange={(e) => {
                 setSearchLocal(e.target.value);
                 setPage(1); // reset página
-            }}
-            style={{ width: "220px" }}
-            />
+            }} style={{ width: "220px" }} />
 
-            <button className="btn btn-success" onClick={exportarExcel}>
-              📊 Exportar Excel
+            <button className="btn btn-success" onClick={exportarExcel} title="Exportar Excel">
+              <i className="bi bi-file-earmark-excel"></i>{" "}
+              <span className="d-none d-md-inline ms-1">Exportar</span>
             </button>
-
-
-            <button className="btn btn-primary m-auto" onClick={() => {
+            <button className="btn btn-primary m-0" title="Asignar nuevo horario" onClick={() => {
                 setEditingHorario(null);      // 👈 creación normal
                 setShowModal(true);
               }}
-            > ➕ Nuevo Horario 
+            > ➕ <span className="d-none d-md-inline ms-1">Nuevo Horario </span>
             </button>
-        </div>
-        
+        </div>        
       </div>
 
-      <table className="table table-bordered table-hover">
+      <table className="table table-bordered table-hover table-sm align-middle">
         <thead className="table-light">
-          <tr>
-            <th>Local</th>
-            <th>Días</th>
-            <th>Apertura - Cierre</th>
+          <tr className="text-center">
+            <th><span className="d-none d-md-inline ms-1">Nombre </span>Local</th>
+            <th className="d-none d-md-table-cell">Días</th>
+            <th className="d-none d-md-table-cell">Apertura - Cierre</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -137,9 +133,17 @@ export default function HorariosBasePage({ token }) {
           ) : (
             horarios.map((local) => (
               <tr key={local.codlocal}>
-                <td><strong>{local.local_nombre}</strong></td>
+                <td><strong>{local.local_nombre}</strong>
+                <div className="d-md-none text-muted small text-left" style={{ width: "100%" }}>
+                  {local.horarios.map((h, i) => (
+                    <div key={i}>
+                      {h.dias} - {h.cerrado ? "CERRADO" : `${h.horario}`}
+                    </div>
+                  ))}
+                </div>
+              </td>
 
-                <td>
+                <td className="d-none d-md-table-cell">
                   {local.horarios.map((h, i) => (
                     <div key={i}>
                       {h.dias}
@@ -147,7 +151,7 @@ export default function HorariosBasePage({ token }) {
                   ))}
                 </td>
 
-                <td>
+                <td className="d-none d-md-table-cell">
                   {local.horarios.map((h, i) => (
                     <div key={i}>
                       {h.cerrado
@@ -158,40 +162,78 @@ export default function HorariosBasePage({ token }) {
                 </td>
 
                 <td className="text-center">
-                  <button className="btn btn-sm btn-outline-primary" title="Reemplazar Horario" onClick={() => {
-                      setEditingHorario({
-                        codlocal: local.codlocal,
-                        local_nombre: local.local_nombre
-                      });
-                      setShowModal(true);
-                    }}>🔁 
-                  </button>
+                  <div className="d-none d-md-flex gap-2">
+                    <button className="btn btn-sm btn-outline-primary" title="Reemplazar Horario" onClick={() => {
+                        setEditingHorario({
+                          codlocal: local.codlocal,
+                          local_nombre: local.local_nombre
+                        });
+                        setShowModal(true);
+                      }}>🔁 
+                    </button>
 
-                  <button className="btn btn-sm btn-outline-warning ms-2" title="Asignar Horario Especial"
-                    onClick={() => {
-                      setHorarioEspecial({
-                        codlocal: local.codlocal,
-                        local_nombre: local.local_nombre
-                      });
-                      setShowEspecialModal(true);
-                    }}
-                  > ⏰
-                  </button>
-                  <button className="btn btn-sm btn-outline-secondary ms-2" title="Ver Tickets" onClick={() => {
-                      setTickets({
-                        codlocal: local.codlocal,
-                        local_nombre: local.local_nombre
-                      });
-                      setShowTicketsModal(true);
-                    }}>📊 
-                  </button>
+                    <button className="btn btn-sm btn-outline-warning ms-2" title="Asignar Horario Especial"
+                      onClick={() => {
+                        setHorarioEspecial({
+                          codlocal: local.codlocal,
+                          local_nombre: local.local_nombre
+                        });
+                        setShowEspecialModal(true);
+                      }}
+                    > ⏰
+                    </button>
+                    <button className="btn btn-sm btn-outline-secondary ms-2" title="Ver Tickets" onClick={() => {
+                        setTickets({
+                          codlocal: local.codlocal,
+                          local_nombre: local.local_nombre
+                        });
+                        setShowTicketsModal(true);
+                      }}>📊 
+                    </button>
+                  </div>
+                  {/* MOBILE */}
+                  <MobileActions
+                    actions={[
+                      {
+                        label: "Reemplazar Horario",
+                        icon: "🔁",
+                        onClick: () => {
+                          setEditingHorario({
+                            codlocal: local.codlocal,
+                            local_nombre: local.local_nombre
+                          });
+                          setShowModal(true);
+                        }
+                      },
+                      {
+                        label: "Asignar Horario Especial",
+                        icon: "⏰",
+                        onClick: () => {
+                          setHorarioEspecial({
+                            codlocal: local.codlocal,
+                            local_nombre: local.local_nombre
+                          });
+                          setShowEspecialModal(true);
+                        }
+                      },
+                      {
+                        label: "Ver Tickets",
+                        icon: "📊",
+                        onClick: () => {
+                          setTickets({
+                            codlocal: local.codlocal,
+                            local_nombre: local.local_nombre
+                          });
+                          setShowTicketsModal(true);
+                        }
+                      }
+                    ]}
+                  />
                 </td>
-
               </tr>
             ))
           )}
         </tbody>
-
       </table>
 
       <Pagination
