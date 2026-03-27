@@ -127,7 +127,7 @@ function App() {
         <LoginForm onLogin={handleLogin} />
       ) : (
         <>
-          <Navbar user={user} onLogout={handleLogout} />
+          <Navbar user={user} onLogout={handleLogout} token={token} />
           <div className="container mt-4">
             <Layout token={token} user={user} />
           </div>
