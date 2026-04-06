@@ -13,6 +13,7 @@ function EstadoEquiposView() {
     try {
       const res = await fetch(`${API_BASE_URL}/actualizaciones/estado-equipos`);
       const d = await res.json();
+      
       setData(d);
     } catch (err) {
       console.error(err);
@@ -56,11 +57,12 @@ function EstadoEquiposView() {
   };
 
   return (
-    <div className="card p-3 shadow-sm">
+    <div className="card shadow-sm">
 
-      <div className="d-flex justify-content-between align-items-center mb-2">
-        <h5>Monitoreo de Equipos</h5>
+      <div className="card-header d-flex justify-content-between align-items-center gap-2">
+        <h5 className="mb-0" title="Monitoreo de Equipos">Monitoreo<span className="d-none d-md-inline">de Equipos</span></h5>
         <div className="d-flex align-items-center gap-2">
+          <div className="w-50">{data.length} <span className="d-none d-md-inline">Equi</span>pos</div>
           <select className="form-select w-0 py-1" value={filtroEstado}
             onChange={(e) => setFiltroEstado(e.target.value)}  >
             <option value="todos">Todos</option>
@@ -76,13 +78,13 @@ function EstadoEquiposView() {
       {loading && <div>Cargando...</div>}
 
       {!loading && (
-        <div className="table-responsive">
-          <table className="table table-sm table-bordered">
+        <div style={{ maxHeight: 500, overflowY: "auto" }}>
+          <table className="table table-hover table-sm mb-0" >
             <thead className="table-light">
               <tr>
                 <th>Equipo</th>
-                <th>Módulo</th>
-                <th>Última actualización</th>
+                <th title="Utima Actualizacion">Módulo</th>
+                <th className="d-none d-md-table-cell">Última Actualización</th>
                 <th>Estado</th>
               </tr>
             </thead>
@@ -103,8 +105,12 @@ function EstadoEquiposView() {
                       </td>
                     )}
 
-                    <td>{m.modulo}</td>
-                    <td>{formatFechaHora(m.fecha)}</td>
+                    <td>{m.modulo}
+                      <div className="d-md-none text-muted small text-left" style={{ width: "150px" }}>
+                        {formatFechaHora(m.fecha)} <br />
+                      </div>
+                    </td>
+                    <td className="d-none d-md-table-cell">{formatFechaHora(m.fecha)}</td>
                     <td>{getEstadoBadge(m.estado)}</td>
                   </tr>
                 ));

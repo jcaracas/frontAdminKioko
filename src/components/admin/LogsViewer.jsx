@@ -89,8 +89,7 @@ function LogsViewer({ token }) {
           <div className="d-flex flex-row col-md-4 gap-1 align-items-center m-0">
             <label className="form-label small text-muted mb-0 w-25">Local:</label>
             <input placeholder="Filtrar por local" className="form-control form-control-sm" value={localFilter} onChange={(e) => setLocalFilter(e.target.value)} />
-          </div>
-          
+          </div>          
         </div>
 
         {message && <div className="alert alert-warning small">{message}</div>}

@@ -268,7 +268,7 @@ export default function HorariosBasePage({ token }) {
       {showTicketsModal && (
         <ZendeskTicketsView
           token={token}
-          data={tickets}
+          dataLocal={tickets}
           onClose={() => setShowTicketsModal(false)}
         />
       )}

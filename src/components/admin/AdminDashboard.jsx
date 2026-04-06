@@ -5,12 +5,16 @@ import Logs from "./LogsViewer";
 import VentasDistribuidasView from "./VentasDistribuidasView";
 import UltimaVentaLocal from "./UltimaVentaLocal";
 import Actualizaciones from "./Actualizaciones";
+import { useLocation } from "react-router-dom";
 
 function AdminDashboard({ token }) {
-  const [activeTab, setActiveTab] = useState("users");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
   const [visibleCount, setVisibleCount] = useState(4);
   const [open, setOpen] = useState(false);
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(
+    location.state?.tab || "users" // default
+  );
 
   const containerRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -23,6 +27,14 @@ function AdminDashboard({ token }) {
     { key: "ventas", label: "Ventas" },
     { key: "actualizaciones", label: "Actualización POS" }
   ];
+
+  useEffect(() => {
+    if (location.state?.tab) {
+      setActiveTab(location.state.tab);
+    } else {
+      setActiveTab("users");
+    } 
+  }, [location.state]);
 
   /* detectar tamaño */
   useEffect(() => {

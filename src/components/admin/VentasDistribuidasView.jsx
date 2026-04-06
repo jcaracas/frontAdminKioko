@@ -31,7 +31,7 @@ function VentasDistribuidasView({token}) {
     <div className="container-fluid mt-0 p-0">
       <h4 className="mb-3">📊 Conciliación Local vs Central</h4>
 
-      <div className="table-responsive">
+      <div style={{ maxHeight: 500, overflowY: "auto" }}>
         <table className="table table-bordered table-sm align-middle">
           
           <thead className="table-light">

@@ -67,7 +67,9 @@ function MyNavbar({ user, onLogout, token }) {
 
       cargarNotificaciones(); // 🔥 refresca la lista después de marcar como leído
       // 🚀 redirigir
-      navigate("/admin");
+      navigate("/admin", {
+        state: { tab: "ultima-venta" }
+      });
       setShow(false);
 
     } catch (err) {

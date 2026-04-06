@@ -1,46 +1,64 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { API_BASE_URL } from "../../config"; // ajusta la ruta si aplica
 
-function ZendeskTicketsView({onClose}) {
-  const [fechaInicio, setFechaInicio] = useState("");
-  const [fechaFin, setFechaFin] = useState("");
-  const [tickets, setTickets] = useState([]);
+function ZendeskTicketsView({token,dataLocal,onClose}) {
+  // 🔥 Fecha por defecto = ayer
+  const getYesterday = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return d.toISOString().split("T")[0];
+  };
+
+  const [desde, setDesde] = useState(getYesterday());
+  const [hasta, setHasta] = useState(getYesterday());
+  const [codLocal, setCodLocal] = useState(dataLocal.codlocal);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const buscar = async () => {
-    if (!fechaInicio || !fechaFin) {
-      setError("Debe seleccionar un rango de fechas");
-      return;
-    }
+  const [status, setStatus] = useState("");
+  
+  const cargar = async () => {
+    setLoading(true);
 
     try {
-      setLoading(true);
-      setError("");
-      setTickets([]);
+      let url = `${API_BASE_URL}/zendesk/local/${codLocal}?desde=${desde}&hasta=${hasta}`;
 
-      const response = await fetch(
-        `${API_BASE_URL}/zendesk/tickets?desde=${fechaInicio}&hasta=${fechaFin}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`Error ${response.status} consultando tickets`);
+      if (status) {
+        url += `&status=${status}`;
       }
 
-      const data = await response.json();
-      console.log(data[0]);
-      
-      setTickets(data);
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const d = await res.json();
 
-      
+      setData(d);
+
     } catch (err) {
       console.error(err);
-      setError("No fue posible obtener los tickets");
-    } finally {
-      setLoading(false);
     }
 
-    
+    setLoading(false);
+  };
+
+  const setUltimos7Dias = () => {
+    const ahora = new Date();
+    const semana = new Date();
+    semana.setDate(ahora.getDate() - 7);
+
+    setDesde(semana.toISOString().split("T")[0]);
+    setHasta(ahora.toISOString().split("T")[0]);
+  };
+
+  // 🔥 Carga inicial
+  useEffect(() => {
+    cargar();
+  }, [desde, hasta, status]);
+
+  // 📅 Formato fecha
+  const formatFecha = (f) => {
+    if (!f) return "-";
+    return new Date(f).toLocaleString("es-CL");
   };
 
   return (
@@ -49,84 +67,74 @@ function ZendeskTicketsView({onClose}) {
             <div className="modal-content">
 
             <div className="modal-header">
-                <h4 className="m-0">📊 Reporte de Tickets Zendesk</h4>
+                <h5 className="mb-0">Tickets Zendesk por Local</h5>
                 <button type="button" className="btn-close" onClick={() => onClose?.()}></button>
             </div>
+            {/* 🔍 Filtros */}
+            <div className="d-flex gap-2 mb-2 p-2 flex-wrap">
+              <input className="form-control w-25" type="date" value={desde} onChange={(e) => setDesde(e.target.value)} />
+              <input className="form-control w-25" type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} />
 
-            {/* FILTROS */}
-            <div className="row mb-3 p-3">
-                <div className="col-md-3">
-                <label className="form-label">Desde</label>
-                <input
-                    type="date"
-                    className="form-control"
-                    value={fechaInicio}
-                    onChange={(e) => setFechaInicio(e.target.value)}
-                />
-                </div>
+              <select value={status} onChange={(e) => setStatus(e.target.value)} className="form-select w-auto">
+                <option value="">Todos</option>
+                <option value="open">Abiertos</option>
+                <option value="pending">Pendientes</option>
+                <option value="closed">Cerrados</option>
+              </select>
 
-                <div className="col-md-3">
-                <label className="form-label">Hasta</label>
-                <input
-                    type="date"
-                    className="form-control"
-                    value={fechaFin}
-                    onChange={(e) => setFechaFin(e.target.value)}
-                />
-                </div>
-
-                <div className="col-md-3 d-flex align-items-end">
-                <button
-                    className="btn btn-primary w-100"
-                    onClick={buscar}
-                    disabled={loading}
-                >
-                    {loading ? "Consultando..." : "Buscar"}
-                </button>
-                </div>
+              <button className="btn btn-secondary" onClick={setUltimos7Dias}>Últimos 7 días</button>
+              
             </div>
 
-            {/* ERROR */}
-            {error && <div className="alert alert-danger">{error}</div>}
+            {/* ⏳ Loading */}
+            {loading && <div>Cargando...</div>}
 
-            {/* RESULTADOS */}
-            <div className="table-responsive p-3" style={{ maxHeight: "400px" }}>
-                <table className="table table-bordered table-sm">
+            {/* 📊 Tabla */}
+            <div className="table-responsive p-2">
+              <table className="table table-sm table-bordered">
+
                 <thead className="table-light">
-                    <tr>
-                    <th>Fecha</th>
-                    <th>Local</th>
-                    <th>Tipo Consulta</th>
-                    <th>Zonal</th>
-                    <th>Incidencia</th>
-                    <th>ID Ticket</th>
-                    </tr>
+                  <tr>
+                    <th>Ticket</th>
+                    <th>Estado</th>
+                    <th>Tipo</th>
+                    <th>Servicio</th>
+                    <th>Consulta</th>
+                    <th>Fecha Creación</th>
+                    <th>Última Actualización</th>
+                    <th>Completado</th>
+                  </tr>
                 </thead>
-                <tbody>
-                    {tickets.length === 0 && !loading && (
-                    <tr>
-                        <td colSpan="6" className="text-center text-muted">
-                        Sin resultados
-                        </td>
-                    </tr>
-                    )}
 
-                    {tickets.map((t) => (
-                    <tr key={t.id_ticket}>
-                        <td style={{ width: "110px", whiteSpace: "nowrap" }}>{new Date(t.created_at).toLocaleDateString()}</td>
-                        <td>{t.fields[2].value}</td>
-                        <td>{t.fields[5].value}</td>
-                        <td>{t.fields[3].value}</td>
-                        <td style={{ width: "110px", whiteSpace: "nowrap" }}>{t.fields[4].value}</td>
-                        <td style={{ width: "110px", whiteSpace: "nowrap" }}>{t.encoded_id}</td>
+                <tbody>
+                  {data.length === 0 ? (
+                    <tr>
+                      <td colSpan="8" className="text-center">
+                        Sin resultados
+                      </td>
                     </tr>
-                    ))}
+                  ) : (
+                    data.map((t) => (
+                      <tr key={t.id}>
+                        <td>{t.ticket_id}</td>
+                        <td>{t.status}</td>
+                        <td>{t.tipo_ticket || "-"}</td>
+                        <td>{t.tipo_servicio || "-"}</td>
+                        <td>{t.tipo_consulta || "-"}</td>
+                        <td>{formatFecha(t.zd_created_at)}</td>
+                        <td>{formatFecha(t.zd_updated_at)}</td>
+                        <td>
+                          {t.requerimiento_completado
+                            ? <span className="badge bg-success">Sí</span>
+                            : <span className="badge bg-secondary">No</span>}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
-                </table>
-            </div>
-            
-              </div>
-        
+            </table>
+          </div>          
+        </div>
       </div>
     </div>
   );

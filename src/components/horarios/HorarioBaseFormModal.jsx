@@ -181,7 +181,7 @@ export default function HorarioBaseFormModal({ token, show, onClose, onSaved, lo
                     <input type="checkbox" className="form-check-input" checked={cerrado} 
                       onChange={e => setCerrado(e.target.checked)}
                     />
-                    <label className="form-check-label">Local Cerrado</label>
+                    <label className="form-check-label"><span className="d-none d-md-inline ms-1">Local</span> Cerrado</label>
                   </div>
                 </div>
               </div>
@@ -190,10 +190,10 @@ export default function HorarioBaseFormModal({ token, show, onClose, onSaved, lo
               {!cerrado && (
                 <div className="row mb-2">
                   <div className="d-flex justify-content-start gap-3 mb-2 align-items-center">
-                    <label className="form-label mb-0">Hora Apertura: </label>
+                    <label className="form-label mb-0" title="Horario de Apertura"><span className="d-none d-md-inline ms-1">Hora</span> Apertura: </label>
                     <input type="time" className="form-control w-25" value={horaApertura}
                       onChange={e => setHoraApertura(e.target.value)} />
-                    <label className="form-label mb-0">Hora Cierre: </label>
+                    <label className="form-label mb-0" title="Horario de cierre"><span className="d-none d-md-inline ms-1">Hora</span> Cierre: </label>
                     <input type="time" className="form-control w-25" value={horaCierre}
                       onChange={e => setHoraCierre(e.target.value)} />
                   </div>
