@@ -6,6 +6,14 @@ function EstadoEquiposView() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filtroEstado, setFiltroEstado] = useState("todos");
+  const [filtroEquipo, setFiltroEquipo] = useState("");
+
+  // 🔥 Normalizar texto (búsqueda robusta)
+  const normalizar = (txt) =>
+    (txt || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
 
   const cargar = async () => {
     setLoading(true);
@@ -13,7 +21,6 @@ function EstadoEquiposView() {
     try {
       const res = await fetch(`${API_BASE_URL}/actualizaciones/estado-equipos`);
       const d = await res.json();
-      
       setData(d);
     } catch (err) {
       console.error(err);
@@ -51,45 +58,92 @@ function EstadoEquiposView() {
     }
   };
 
+  // 🔥 Filtrar módulos por estado
   const filtrarModulos = (modulos) => {
     if (filtroEstado === "todos") return modulos;
     return modulos.filter(m => m.estado === filtroEstado);
   };
 
+  // 🔥 FILTRO COMBINADO (equipo + estado)
+  const dataFiltrada = data.filter((eq) => {
+
+    const matchEquipo = normalizar(eq.equipo)
+      .includes(normalizar(filtroEquipo));
+
+    const matchEstado =
+      filtroEstado === "todos"
+        ? true
+        : eq.modulos.some(m => m.estado === filtroEstado);
+
+    return matchEquipo && matchEstado;
+  });
+
   return (
     <div className="card shadow-sm">
 
-      <div className="card-header d-flex justify-content-between align-items-center gap-2">
-        <h5 className="mb-0" title="Monitoreo de Equipos">Monitoreo<span className="d-none d-md-inline">de Equipos</span></h5>
+      <div className="card-header d-flex justify-content-between align-items-center gap-2 flex-wrap">
+        
+        <h5 className="mb-0">
+          Monitoreo de Equipos
+        </h5>
+
         <div className="d-flex align-items-center gap-2">
-          <div className="w-50">{data.length} <span className="d-none d-md-inline">Equi</span>pos</div>
-          <select className="form-select w-0 py-1" value={filtroEstado}
-            onChange={(e) => setFiltroEstado(e.target.value)}  >
+
+          {/* 🔍 Buscar equipo */}
+          <input  type="text" className="form-control py-1" placeholder="Buscar equipo..."
+            value={filtroEquipo} onChange={(e) => setFiltroEquipo(e.target.value)} style={{ maxWidth: "150px" }} />
+
+          {/* 🔢 contador */}
+          <div className="w-75">{data.length} <span className="d-none d-md-inline">EQUI</span>POS</div>
+
+          {/* 🎯 filtro estado */}
+          <select className="form-select py-1" value={filtroEstado}
+            onChange={(e) => setFiltroEstado(e.target.value)} >
             <option value="todos">Todos</option>
             <option value="actualizado">Actualizado</option>
             <option value="No Actualizado">No Actualizado</option>
             <option value="Sin Archivos">Sin Archivos</option>
             <option value="Carpeta No Existe">Carpeta No Existe</option>
           </select>
-          <button onClick={cargar} className="btn btn-sm btn-outline-secondary m-0"><i className="bi bi-arrow-clockwise"></i></button>
+
+          {/* 🔄 refresh */}
+          <button
+            onClick={cargar}
+            className="btn btn-sm btn-outline-secondary"
+          >
+            <i className="bi bi-arrow-clockwise"></i>
+          </button>
+
         </div>
       </div>
 
-      {loading && <div>Cargando...</div>}
+      {loading && <div className="p-3">Cargando...</div>}
 
       {!loading && (
         <div style={{ maxHeight: 500, overflowY: "auto" }}>
-          <table className="table table-hover table-sm mb-0" >
+          <table className="table table-hover table-sm mb-0">
+            
             <thead className="table-light">
               <tr>
                 <th>Equipo</th>
-                <th title="Utima Actualizacion">Módulo</th>
-                <th className="d-none d-md-table-cell">Última Actualización</th>
+                <th>Módulo</th>
+                <th className="d-none d-md-table-cell">
+                  Última Actualización
+                </th>
                 <th>Estado</th>
               </tr>
             </thead>
+
             <tbody>
-              {data.map((eq, i) => {
+              {dataFiltrada.length === 0 && (
+                <tr>
+                  <td colSpan="4" className="text-center">
+                    Sin resultados
+                  </td>
+                </tr>
+              )}
+
+              {dataFiltrada.map((eq, i) => {
 
                 const modulosFiltrados = filtrarModulos(eq.modulos);
 
@@ -97,25 +151,36 @@ function EstadoEquiposView() {
 
                 return modulosFiltrados.map((m, j) => (
                   <tr key={`${i}-${j}`}>
-                    
-                    {/* 🔥 SOLO SE RENDERIZA UNA VEZ */}
+
+                    {/* 👇 equipo solo una vez */}
                     {j === 0 && (
-                      <td rowSpan={modulosFiltrados.length} className="align-middle fw-bold">
+                      <td
+                        rowSpan={modulosFiltrados.length}
+                        className="align-middle fw-bold"
+                      >
                         {eq.equipo}
                       </td>
                     )}
 
-                    <td>{m.modulo}
-                      <div className="d-md-none text-muted small text-left" style={{ width: "150px" }}>
-                        {formatFechaHora(m.fecha)} <br />
+                    <td>
+                      {m.modulo}
+                      <div className="d-md-none text-muted small">
+                        {formatFechaHora(m.fecha)}
                       </div>
                     </td>
-                    <td className="d-none d-md-table-cell">{formatFechaHora(m.fecha)}</td>
+
+                    <td className="d-none d-md-table-cell">
+                      {formatFechaHora(m.fecha)}
+                    </td>
+
                     <td>{getEstadoBadge(m.estado)}</td>
+
                   </tr>
                 ));
               })}
+
             </tbody>
+
           </table>
         </div>
       )}

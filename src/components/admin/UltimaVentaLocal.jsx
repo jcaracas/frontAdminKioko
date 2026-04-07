@@ -112,8 +112,8 @@ function UltimaVentaLocal({ token }) {
       <div className="d-flex justify-content-between mb-2 gap-2 align-items-center">
         <h3 className="m-0">Monitor <span className="d-none d-md-inline">de Ventas</span></h3>
         
-        <select value={filtro} onChange={(e) => setFiltro(e.target.value)} className="form-select w-auto">
-          <option value="Estado">Estado</option>
+        <select value={filtro} onChange={(e) => setFiltro(e.target.value)} className="form-select w-auto" title="Estado de Ventas">
+          <option value="Estado">Todos</option>
           <option value="En horario">En horario</option>
           <option value="Demora leve">Demora leve</option>
           <option value="Critica">Critica</option>
@@ -151,7 +151,7 @@ function UltimaVentaLocal({ token }) {
 
       {/* TABLA */}
 
-      <div className="table-responsive">
+      <div style={{ maxHeight: 500, overflowY: "auto" }}>
         <table className="table table-bordered table-sm">
           <thead className="table-dark">
             <tr className="text-center">

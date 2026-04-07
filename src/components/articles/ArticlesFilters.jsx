@@ -1,7 +1,7 @@
-import { API_BASE_URL } from "../../config";
+//import { API_BASE_URL } from "../../config";
 
 export default function ArticlesFilters({ filters, onChange, onCreate, token }) {
-  const exportarExcel = async () => {
+  /*const exportarExcel = async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/articulos/export/excel`, {
         method: "GET",
@@ -43,11 +43,11 @@ export default function ArticlesFilters({ filters, onChange, onCreate, token }) 
     } catch (error) {
       console.error("Error exporting PDF:", error);
     }
-  };
+  };*/
 
   return (
     <div className="d-flex justify-content-start align-items-center mb-2 gap-3 flex-wrap">
-      <h4 className="mb-0 letraMovil">Gestión de Productos</h4>
+      <h4 className="mb-0 letraMovil" title="Gestión de Productos"><span className="d-none d-md-inline ms-1">Gestión de</span> Productos</h4>
       <div className="col-md-4">
         <input className="form-control" placeholder="Buscar por código o descripción" value={filters.search}
           onChange={(e) =>

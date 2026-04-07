@@ -112,7 +112,7 @@ export default function HorariosBasePage({ token }) {
             </button>
         </div>        
       </div>
-
+      <div style={{ maxHeight: 500, overflowY: "auto" }}>
       <table className="table table-bordered table-hover table-sm align-middle">
         <thead className="table-light">
           <tr className="text-center">
@@ -235,7 +235,7 @@ export default function HorariosBasePage({ token }) {
           )}
         </tbody>
       </table>
-
+    </div>  
       <Pagination
         page={page}
         total={total}

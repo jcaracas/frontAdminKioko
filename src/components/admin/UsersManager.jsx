@@ -99,7 +99,7 @@ function UsersManager({ token }) {
 
       {message && <div className="alert alert-info">{message}</div>}
       <div className="card-body p-0">
-        <div className="table-responsive">
+        <div style={{ maxHeight: 500, overflowY: "auto" }}>
           <table className="table table-hover table-sm mb-0">
             <thead className="sticky-top bg-white shadow-sm">
               <tr className="table-secondary ">

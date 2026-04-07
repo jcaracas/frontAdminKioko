@@ -136,32 +136,18 @@ function MyNavbar({ user, onLogout, token }) {
 
               {/* 🔥 Popup */}
                 {show && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      right: 0,
-                      top: "30px",
-                      width: "300px",
-                      background: "#fff",
-                      border: "1px solid #ddd",
-                      borderRadius: "8px",
-                      boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
-                      zIndex: 1000
-                    }}
-                  >
+                  <div style={{ position: "absolute", right: 0, top: "30px", width: "300px", background: "#fff",
+                      border: "1px solid #ddd", borderRadius: "8px", boxShadow: "0px 4px 10px rgba(0,0,0,0.1)",
+                      zIndex: 1000 }} >
                     {notificaciones.length === 0 ? (
                       <div className="p-2 text-center">Sin notificaciones</div>
                     ) : (
                       notificaciones.map((n) => (
-                        <div
-                          key={n.id}
-                          onClick={() => marcarYRedirigir(n)}
-                          style={{
-                            padding: "10px",
-                            borderBottom: "1px solid #eee",
-                            cursor: "pointer"
-                          }}
-                        >
+                        <div key={n.id} onClick={() => {
+                            if (user?.role === "Admin") {
+                              marcarYRedirigir(n);
+                            }
+                          }} style={{ padding: "10px", borderBottom: "1px solid #eee", cursor: "pointer" }} >
                           <div style={{ fontSize: "12px" }}>{n.contenido}</div>
                         </div>
                       ))

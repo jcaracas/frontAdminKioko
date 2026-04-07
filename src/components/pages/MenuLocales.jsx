@@ -13,11 +13,7 @@ export default function MenuLocales({ token }) {
   const [page, setPage] = useState(1);
   const pageSize = 20;
 
-  async function extraerHtml() {
-    const res = await fetch(`${API_BASE_URL}/zendesk/pedidosya/menu`);
-    const json = await res.json();
-    console.log(json);
-  }
+  
   // ===============================
   // FETCH DATA
   // ===============================
@@ -197,38 +193,39 @@ export default function MenuLocales({ token }) {
           </button>
         </div>
     </div>
-
+    <div style={{ maxHeight: 500, overflowY: "auto" }}>
       {/* TABLA */}
-    <table className="table table-striped">
-        <thead>
-          <tr className="table-secondary">
-            <th>Nombre Local</th>
-            <th className="text-center">Menú Origen</th>
-            <th className="text-center">Crítico</th>
-          </tr>
-        </thead>
-        <tbody>
-            {paginatedLocales.map((l) => (
-                <tr key={l.codLocal}>
-                    <td>{l.local}</td>
-                    <td className="text-center">{l.menuOrigen || "—"}</td>
-                    <td className="text-center">
-                        <input type="checkbox" checked={!!l.menuCritico}
-                            onChange={(e) =>
-                                toggleCritico(l.codLocal, e.target.checked)
-                            }
-                        />
-                    </td>
-                </tr>
-            ))}
-        </tbody>
-    </table>
+      <table className="table table-striped">
+          <thead>
+            <tr className="table-secondary">
+              <th>Nombre Local</th>
+              <th className="text-center">Menú Origen</th>
+              <th className="text-center">Crítico</th>
+            </tr>
+          </thead>
+          <tbody>
+              {paginatedLocales.map((l) => (
+                  <tr key={l.codLocal}>
+                      <td>{l.local}</td>
+                      <td className="text-center">{l.menuOrigen || "—"}</td>
+                      <td className="text-center">
+                          <input type="checkbox" checked={!!l.menuCritico}
+                              onChange={(e) =>
+                                  toggleCritico(l.codLocal, e.target.checked)
+                              }
+                          />
+                      </td>
+                  </tr>
+              ))}
+          </tbody>
+      </table>
+    </div>
     <nav className="d-flex justify-content-center">
         <ul className="pagination">
             <li className={`page-item ${page === 1 && "disabled"}`}>
                 <button className="page-link"
                     onClick={() => setPage(page - 1)} >
-                    Anterior
+                    Ant<span className="d-none d-md-inline ms-1">erior</span>
                 </button>
             </li>
 
@@ -243,7 +240,7 @@ export default function MenuLocales({ token }) {
 
             <li className={`page-item ${page === totalPages && "disabled"}`}>
                 <button className="page-link" onClick={() => setPage(page + 1)} >
-                    Siguiente
+                    Sig <span className="d-none d-md-inline ms-1">uiente</span>
                 </button>
             </li>
         </ul>
