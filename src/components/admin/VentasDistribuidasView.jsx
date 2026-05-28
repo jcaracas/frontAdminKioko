@@ -34,7 +34,7 @@ function VentasDistribuidasView({token}) {
       <div style={{ maxHeight: 500, overflowY: "auto" }}>
         <table className="table table-bordered table-sm align-middle">
           
-          <thead className="table-light">
+          <thead className="table-light sticky-top" style={{ zIndex: 1 }}>
             <tr>
               <th>Local</th>
               <th className="text-end">Local $</th>

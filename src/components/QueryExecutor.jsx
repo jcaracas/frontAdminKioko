@@ -130,6 +130,29 @@ function QueryExecutor({ token }) {
     }
   };
 
+  const getPages = () => {
+    const pages = [];
+
+    const start = Math.max(1, currentPage - 1);
+    const end = Math.min(totalPages, currentPage + 1);
+
+    if (start > 1) {
+      pages.push(1);
+      if (start > 2) pages.push("...");
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    if (end < totalPages) {
+      if (end < totalPages - 1) pages.push("...");
+      pages.push(totalPages);
+    }
+
+    return pages;
+  };
+
   return (
     <div className="card p-4 shadow-sm mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
@@ -151,14 +174,10 @@ function QueryExecutor({ token }) {
 
       {/* 🔹 Campo de búsqueda */}
       <div className="mb-3">
-        <input
-          type="text"
-          placeholder="Buscar por código o descripción..."
-          className="form-control"
-          value={searchTerm}
+        <input type="text" placeholder="Buscar por código o descripción..."
+          className="form-control" value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          disabled={!isConnected}
-        />
+          disabled={!isConnected} />
       </div>
 
       {message && (
@@ -172,10 +191,10 @@ function QueryExecutor({ token }) {
         <table className="table table-striped table-sm">
           <thead>
             <tr className="table-secondary">
-              <th>Código</th>
+              <th>Cód<span className="d-none d-md-inline ms-1">igo</span></th>
               <th>Articulo</th>
               {/*<th>Precio</th>*/}
-              <th>Descripción</th>
+              <th className="d-none d-md-table-cell">Descripción</th>
               <th>Kiosko</th>
               {/*<th>Acción</th>*/}
             </tr>
@@ -191,7 +210,7 @@ function QueryExecutor({ token }) {
                   <td>{a.Codigo}</td>
                   <td>{a.Descrip}</td>
                   {/*<td>{a.Precio}</td>*/}
-                  <td>{a.Observac}</td>
+                  <td className="d-none d-md-table-cell">{a.Observac}</td>
                   <td>
                     <button className={`btn btn-sm ${a.Web ? "btn-success" : "btn-danger"}`} 
                       onClick={() => toggleWeb(a.Codigo, a.Web, currentUser,codLocal,a.Descrip)} title={a.Web ? "Desactivar en Totem" : "Activar en Totem"}>
@@ -215,17 +234,22 @@ function QueryExecutor({ token }) {
       {/* 🔹 Paginador */}
       {totalPages > 1 && (
         <nav>
-          <ul className="pagination justify-content-center">
-            {Array.from({ length: totalPages }, (_, i) => (
+          <ul className="pagination justify-content-center flex-wrap">
+
+            {getPages().map((p, i) => (
               <li
                 key={i}
-                className={`page-item ${currentPage === i + 1 ? "active" : ""}`}
+                className={`page-item ${currentPage === p ? "active" : ""} ${p === "..." ? "disabled" : ""}`}
               >
-                <button className="page-link" onClick={() => setCurrentPage(i + 1)}>
-                  {i + 1}
+                <button
+                  className="page-link"
+                  onClick={() => typeof p === "number" && setCurrentPage(p)}
+                >
+                  {p}
                 </button>
               </li>
             ))}
+
           </ul>
         </nav>
       )}

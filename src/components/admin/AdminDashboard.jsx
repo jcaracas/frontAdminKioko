@@ -6,6 +6,8 @@ import VentasDistribuidasView from "./VentasDistribuidasView";
 import UltimaVentaLocal from "./UltimaVentaLocal";
 import Actualizaciones from "./Actualizaciones";
 import { useLocation } from "react-router-dom";
+import DashboardAgotados from "../pages/DashboardAgotados";
+import ConnectionsAdmin from "./ConnectionsAdmin";
 
 function AdminDashboard({ token }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
@@ -25,7 +27,9 @@ function AdminDashboard({ token }) {
     { key: "logs", label: "Logs" },
     { key: "ultima-venta", label: "Distribución" },
     { key: "ventas", label: "Ventas" },
-    { key: "actualizaciones", label: "Actualización POS" }
+    { key: "actualizaciones", label: "Actualización POS" },
+    { key: "agotados", label: "Agotados" },
+    { key: "connections", label: "Locales" }
   ];
 
   useEffect(() => {
@@ -95,6 +99,8 @@ function AdminDashboard({ token }) {
       case "ultima-venta": return <UltimaVentaLocal token={token} />;
       case "ventas": return <VentasDistribuidasView token={token} />;
       case "actualizaciones": return <Actualizaciones token={token} />;
+      case "agotados": return <DashboardAgotados token={token} />;
+      case "connections": return <ConnectionsAdmin token={token} />;
       default: return null;
     }
   };
@@ -136,19 +142,14 @@ function AdminDashboard({ token }) {
 
           {hiddenTabs.length > 0 && (
             <div className="dropdown-custom" ref={dropdownRef}>
-              <button
-                className="tab-line more-btn"
-                onClick={() => setOpen(prev => !prev)}
-              >
-                ...
+              <button className="tab-line more-btn" onClick={() => setOpen(prev => !prev)} >
+                Mas...
               </button>
 
               {open && (
                 <div className="dropdown-menu-custom">
                   {hiddenTabs.map(tab => (
-                    <div
-                      key={tab.key}
-                      className="dropdown-item-custom"
+                    <div key={tab.key} className="dropdown-item-custom" 
                       onClick={() => {
                         setActiveTab(tab.key);
                         setOpen(false);

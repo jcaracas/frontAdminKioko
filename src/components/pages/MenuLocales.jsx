@@ -196,7 +196,7 @@ export default function MenuLocales({ token }) {
     <div style={{ maxHeight: 500, overflowY: "auto" }}>
       {/* TABLA */}
       <table className="table table-striped">
-          <thead>
+          <thead className="sticky-top bg-white" style={{ zIndex: 1 }}>
             <tr className="table-secondary">
               <th>Nombre Local</th>
               <th className="text-center">Menú Origen</th>
@@ -221,11 +221,11 @@ export default function MenuLocales({ token }) {
       </table>
     </div>
     <nav className="d-flex justify-content-center">
-        <ul className="pagination">
+        <ul className="pagination align-items-center mb-0">
             <li className={`page-item ${page === 1 && "disabled"}`}>
                 <button className="page-link"
                     onClick={() => setPage(page - 1)} >
-                    Ant<span className="d-none d-md-inline ms-1">erior</span>
+                    Anterior
                 </button>
             </li>
 
@@ -240,7 +240,7 @@ export default function MenuLocales({ token }) {
 
             <li className={`page-item ${page === totalPages && "disabled"}`}>
                 <button className="page-link" onClick={() => setPage(page + 1)} >
-                    Sig <span className="d-none d-md-inline ms-1">uiente</span>
+                    Siguiente
                 </button>
             </li>
         </ul>

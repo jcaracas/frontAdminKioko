@@ -80,16 +80,12 @@ function MyNavbar({ user, onLogout, token }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <Navbar bg="dark" variant="dark" expand="lg" className="shadow-sm position-relative"
-      expanded={expanded} onToggle={() => setExpanded(!expanded)}>
+    <Navbar bg="dark" variant="dark" expand="lg" className="shadow-sm" style={{ zIndex: 1050 }}
+      expanded={expanded} onToggle={() => setExpanded(!expanded)} sticky="top">
       <Container fluid>
 
         <Navbar.Brand onClick={() => navigate("/")} style={{ cursor: "pointer" }}>
-          <img
-            src="T.png"
-            alt="Logo"
-            style={{ height: "28px", marginRight: "8px" }}
-          />
+          <img src="T.png" alt="Logo" style={{ height: "28px", marginRight: "8px" }} />
           Manager Crack
         </Navbar.Brand>
 

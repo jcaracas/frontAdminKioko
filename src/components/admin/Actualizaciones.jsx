@@ -80,13 +80,8 @@ function EstadoEquiposView() {
 
   return (
     <div className="card shadow-sm">
-
       <div className="card-header d-flex justify-content-between align-items-center gap-2 flex-wrap">
-        
-        <h5 className="mb-0">
-          Monitoreo de Equipos
-        </h5>
-
+        <h5 className="mb-0">Monitoreo de Equipos</h5>
         <div className="d-flex align-items-center gap-2">
 
           {/* 🔍 Buscar equipo */}
@@ -123,8 +118,8 @@ function EstadoEquiposView() {
         <div style={{ maxHeight: 500, overflowY: "auto" }}>
           <table className="table table-hover table-sm mb-0">
             
-            <thead className="table-light">
-              <tr>
+            <thead className="sticky-top bg-white shadow-sm" style={{ zIndex: 1 }}>
+              <tr className="table-secondary">
                 <th>Equipo</th>
                 <th>Módulo</th>
                 <th className="d-none d-md-table-cell">

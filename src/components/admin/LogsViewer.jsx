@@ -96,7 +96,7 @@ function LogsViewer({ token }) {
 
         <div style={{ maxHeight: 500, overflowY: "auto" }}>
           <table className="table table-hover table-sm mb-0">
-            <thead className="sticky-top bg-white shadow-sm">
+            <thead className="sticky-top bg-white shadow-sm" style={{ zIndex: 1 }}>
               <tr className="table-secondary">
                 <th style={{ width: '15%' }}>Fecha</th>
                 <th style={{ width: '15%' }}>Usuario</th>

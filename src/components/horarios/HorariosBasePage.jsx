@@ -114,8 +114,8 @@ export default function HorariosBasePage({ token }) {
       </div>
       <div style={{ maxHeight: 500, overflowY: "auto" }}>
       <table className="table table-bordered table-hover table-sm align-middle">
-        <thead className="table-light">
-          <tr className="text-center">
+        <thead className="table-light sticky-top" style={{ zIndex: 1 }}>
+          <tr className="text-center table-secondary">
             <th><span className="d-none d-md-inline ms-1">Nombre </span>Local</th>
             <th className="d-none d-md-table-cell">Días</th>
             <th className="d-none d-md-table-cell">Apertura - Cierre</th>

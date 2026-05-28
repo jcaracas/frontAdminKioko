@@ -86,9 +86,9 @@ const ArticlesTable = ({ articles, token, onUpdated,onEdit }) => {
   return (
     <div style={{ maxHeight: 500, overflowY: "auto" }}>
       <table className="table table-bordered table-hover align-middle">
-        <thead className="table-light">
-          <tr className="text-center">
-            <th title="SKU de articulo">Cód<span className="d-none d-md-inline ms-1">igo</span></th>
+        <thead className="sticky-top bg-white" style={{ zIndex: 1 }}>
+          <tr className="text-center table-secondary">
+            <th title="SKU de articulo">Código</th>
             <th title="Descripción" className="d-none d-md-table-cell">Descripción</th>
             <th title="Precio" className="d-none d-md-table-cell">Precio</th>
             <th title="Menús" className="d-none d-md-table-cell">Menús</th>

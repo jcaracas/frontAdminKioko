@@ -153,8 +153,8 @@ function UltimaVentaLocal({ token }) {
 
       <div style={{ maxHeight: 500, overflowY: "auto" }}>
         <table className="table table-bordered table-sm">
-          <thead className="table-dark">
-            <tr className="text-center">
+          <thead className="sticky-top bg-white shadow-sm" style={{ zIndex: 1 }}>
+            <tr className="table-secondary text-center">
               <th><span className="d-none d-md-inline">Nombre </span>Local</th>
               <th className="d-none d-md-table-cell" style={{ width: 200 }}>Última Venta</th>
               <th style={{ width: 100 }}>Minutos</th>

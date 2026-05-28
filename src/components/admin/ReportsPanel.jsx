@@ -100,31 +100,26 @@ function ReportsPanel({ token }) {
           <div className="d-flex align-items-center col-auto gap-2">
             <label className="form-label small mb-0">Top</label>
             <input type="number" className="form-control form-control-sm" value={limit}
-              onChange={(e) => setLimit(e.target.value)}
-              style={{ width: 80 }}
-            />
+              onChange={(e) => setLimit(e.target.value)} style={{ width: 80 }} />
           </div>
         </div>
 
         {message && <div className="alert alert-warning">{message}</div>}
 
         <div className="row">
-          <div className="col-12 mb-0 p-1">
+          <div className="col-12 mb-0 p-0">
             <div className="card mb-0">
               <div className="card-header d-flex justify-content-between align-items-center ">
                 <strong>Artículos agotados por local</strong>
-                <button
-                  className="btn btn-sm btn-outline-success"
-                  onClick={() => exportXlsx(`Agotados`)}
-                >
+                <button className="btn btn-sm btn-outline-success" onClick={() => exportXlsx(`Agotados`)} >
                   <span className="d-none d-md-inline ms-1">Exportar</span> Excel
                 </button>
               </div>
               {loading && <p>Cargando...</p>}
-              <div className="table-responsive">
+              <div style={{ maxHeight: 500, overflowY: "auto" }}>
                 <table className="table table-striped table-sm">
 
-                  <thead>
+                  <thead className="sticky-top bg-white shadow-sm" style={{ zIndex: 1 }}>
                     <tr>
                       <th>Local</th>
                       <th>Fecha</th>
