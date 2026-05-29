@@ -24,6 +24,14 @@ function ConnectionsAdmin({ token }) {
   const [search, setSearch] = useState("");
   const [showDetalle, setShowDetalle] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  // 🔥 OPCIONES EMPRESA
+  const empresasOptions = [
+    { rut: "89505200-0", razon_social: "Comercial Tarragona S.A" },
+    { rut: "77686950-3", razon_social: "Administradora Arbal Ltda." },
+    { rut: "81256700-4", razon_social: "Avicola Montserrat Ltda." },
+    { rut: "84128600-6", razon_social: "Distribuidora Montserrat" },
+    { rut: "83037300-4", razon_social: "Comercial Juan Batlle" },
+  ];
 
   const headers = {
     Authorization: `Bearer ${token}`,
@@ -137,6 +145,27 @@ function ConnectionsAdmin({ token }) {
           <div className="col-md-2">
             <input className="form-control" name="codLocal" placeholder="CodLocal"
               value={form.codLocal} onChange={onChange} />
+          </div>
+
+          <div className="col-md-3">
+            <select className="form-select" value={`${form.rut}|${form.razon_social}`} onChange={(e) => {
+                const [rut, razon_social] = e.target.value.split("|");
+                setForm(prev => ({
+                  ...prev,
+                  rut,
+                  razon_social
+                }));
+              }}
+            >
+              <option value=""> Seleccione Empresa </option>
+              {empresasOptions.map((empresa, index) => (
+                <option key={index} value={`${empresa.rut}|${empresa.razon_social}`} >
+
+                  {empresa.rut} {" - "}  {empresa.razon_social}
+
+                </option>
+              ))}
+            </select>
           </div>
           
           <div className="col-md-6 d-flex gap-3 align-items-center">
