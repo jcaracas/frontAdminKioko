@@ -29,10 +29,11 @@ function UltimaVentaLocal({ token }) {
 
       d.sort((a, b) => {
         const prioridad = {
-          Critica: 1,
-          "Demora leve": 2,
-          "En horario": 3,
-          "Sin ventas hoy": 4,
+          Critica: 2,
+          "Demora leve": 3,
+          "En horario": 4,
+          "Sin ventas hoy": 1,
+          "Cerrado": 5,
         };
         return prioridad[a.estado] - prioridad[b.estado];
       });
@@ -76,6 +77,7 @@ function UltimaVentaLocal({ token }) {
     if (estado === "En horario") return "badge bg-success";
     if (estado === "Demora leve") return "badge bg-warning";
     if (estado === "Sin ventas hoy") return "badge bg-secondary";
+    if (estado === "Cerrado") return "badge bg-dark";
     return "badge bg-danger";
   };
 
@@ -85,6 +87,7 @@ function UltimaVentaLocal({ token }) {
     if (estado === "Critica") return "#ffd6d6";
     if (estado === "Demora leve") return "#fff4cc";
     if (estado === "En horario") return "#e6ffe6";
+    if (estado === "Cerrado") return "#f8f9fa";
     return "";
   };
 
@@ -118,6 +121,7 @@ function UltimaVentaLocal({ token }) {
           <option value="Demora leve">Demora leve</option>
           <option value="Critica">Critica</option>
           <option value="Sin ventas hoy">Sin ventas hoy</option>
+          <option value="Cerrado">Cerrado Hoy</option>
         </select>
 
 

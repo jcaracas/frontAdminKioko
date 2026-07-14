@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { API_BASE_URL } from "../../config";
 import MobileActions from "../utils/MobileActions";
 import ConnectionDetalleModal from "./ConnectionDetalleModal";
+import * as XLSX from "xlsx";
 
 function ConnectionsAdmin({ token }) {
   const emptyForm = {
@@ -15,7 +16,9 @@ function ConnectionsAdmin({ token }) {
     c_kds: "",
     llamador: false,
     c_llamador: "",
-    activo: true
+    activo: true,
+    rut: "",
+    razon_social: ""
   };
 
   const [data, setData] = useState([]);
@@ -24,6 +27,7 @@ function ConnectionsAdmin({ token }) {
   const [search, setSearch] = useState("");
   const [showDetalle, setShowDetalle] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  
   // 🔥 OPCIONES EMPRESA
   const empresasOptions = [
     { rut: "89505200-0", razon_social: "Comercial Tarragona S.A" },
@@ -32,6 +36,15 @@ function ConnectionsAdmin({ token }) {
     { rut: "84128600-6", razon_social: "Distribuidora Montserrat" },
     { rut: "83037300-4", razon_social: "Comercial Juan Batlle" },
   ];
+
+  const [filtros, setFiltros] = useState({
+    texto: "",
+    razonSocial: "",
+    kiosko: "",
+    kds: "",
+    llamador: "",
+    activo: ""
+  });
 
   const headers = {
     Authorization: `Bearer ${token}`,
@@ -48,6 +61,7 @@ function ConnectionsAdmin({ token }) {
       );
 
       const json = await res.json();
+      
       setData(json);
     } catch (err) {
       console.error(err);
@@ -117,16 +131,181 @@ function ConnectionsAdmin({ token }) {
       cargar();
     };
 
+
+    const dataFiltrada = data.filter(item => {
+      const cumpleTexto =
+        !filtros.texto ||
+
+        item.name?.toLowerCase().includes(
+          filtros.texto.toLowerCase()
+        ) ||
+
+        item.codLocal?.toString().includes(
+          filtros.texto
+        );
+
+      const cumpleRazonSocial =
+        !filtros.razonSocial ||
+
+        item.razon_social === filtros.razonSocial;
+
+      const cumpleKiosko =
+        filtros.kiosko === "" ||
+
+        item.kiosko ===
+          (filtros.kiosko === "true");
+
+      const cumpleKds =
+        filtros.kds === "" ||
+
+        item.kds ===
+          (filtros.kds === "true");
+
+      const cumpleActivo =
+        filtros.activo === "" ||
+
+        item.activo ===
+          (filtros.activo === "true");
+
+      return (
+        cumpleTexto &&
+        cumpleRazonSocial &&
+        cumpleKiosko &&
+        cumpleKds &&
+        cumpleActivo
+      );
+    });
+
+    const exportarExcel = () => {
+      const rows = dataFiltrada.map(local => ({
+        "Código Local": local.codLocal,
+        "Nombre Local": local.name,
+        "RUT": local.rut,
+        "Razón Social": local.razon_social,
+        "Host": local.host,
+        "Activo": local.activo ? "Sí" : "No",
+        "Kiosko": local.kiosko ? "Sí" : "No",
+        "Cant. Kiosko": local.ck || 0,
+        "KDS": local.kds ? "Sí" : "No",
+        "Cant. KDS": local.c_kds || 0,
+        "Llamador": local.llamador ? "Sí" : "No",
+        "Cant. Llamador": local.c_llamador || 0,
+        "Zonal": local.zonal_nombre || ""
+      }));
+
+      const workbook = XLSX.utils.book_new();
+
+      const worksheet =
+        XLSX.utils.json_to_sheet(rows);
+
+      XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "Locales"
+      );
+
+      const fecha = new Date()
+        .toISOString()
+        .split("T")[0];
+
+      XLSX.writeFile(
+        workbook,
+        `Locales_${fecha}.xlsx`
+      );
+    };
+
   return (
     <div className="card shadow-sm">
       <div className="card-header d-flex justify-content-between align-items-center">
         <h5 className="mb-0">Administrar Locales</h5>
 
-        <div className="d-flex gap-2">
-          <input className="form-control" placeholder="Buscar..."
-            value={search} onChange={(e) => setSearch(e.target.value)} />
-          <button className="btn btn-primary" onClick={cargar}>Buscar</button>
-        </div>
+        <div className="d-flex gap-2 justify-content-end align-items-center flex-wrap">
+          
+            <div className="col-md-3">
+              <input
+                className="form-control"
+                placeholder="Buscar local..."
+                value={filtros.texto}
+                onChange={(e) =>
+                  setFiltros(prev => ({
+                    ...prev,
+                    texto: e.target.value
+                  }))
+                }
+              />
+            </div>
+
+            <div className="col-md-3">
+              <select
+                className="form-select"
+                value={filtros.razonSocial}
+                onChange={(e) =>
+                  setFiltros(prev => ({
+                    ...prev,
+                    razonSocial: e.target.value
+                  }))
+                }
+              >
+                <option value="">Empresa</option>
+
+                {[...new Set(data.map(x => x.razon_social))]
+                  .filter(Boolean)
+                  .sort()
+                  .map(rs => (
+                    <option key={rs} value={rs}>
+                      {rs}
+                    </option>
+                  ))}
+              </select>
+            </div>
+
+            <div className="col-md-2">
+              <select
+                className="form-select"
+                value={filtros.kiosko}
+                onChange={(e) =>
+                  setFiltros(prev => ({
+                    ...prev,
+                    kiosko: e.target.value
+                  }))
+                }
+              >
+                <option value="">Kiosko</option>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+              </select>
+            </div>
+
+            <div className="col-md-2">
+              <select
+                className="form-select"
+                value={filtros.kds}
+                onChange={(e) =>
+                  setFiltros(prev => ({
+                    ...prev,
+                    kds: e.target.value
+                  }))
+                }
+              >
+                <option value="">KDS</option>
+                <option value="true">Sí</option>
+                <option value="false">No</option>
+              </select>
+            </div>
+
+          </div>
+
+          <button className="btn btn-outline-secondary" onClick={() =>
+              setFiltros({
+                texto: "",
+                razonSocial: "",
+                kiosko: "",
+                kds: "",
+                llamador: "",
+                activo: ""
+              })
+            } > <i className="bi bi-arrow-clockwise"></i> </button>
+  
       </div>
 
       <div className="card-body border-bottom">
@@ -201,7 +380,7 @@ function ConnectionsAdmin({ token }) {
 
       <div className="table-responsive" style={{ maxHeight: 400, overflowY: "auto" }}>
         <table className="table table-sm table-hover mb-0">
-          <thead className="table-light sticky-top">
+          <thead className="table-light sticky-top align-middle">
             <tr>
               <th>Local</th>
               <th>Cod</th>
@@ -209,7 +388,12 @@ function ConnectionsAdmin({ token }) {
               <th>Kiosko</th>
               <th>KDS</th>
               <th>Llamador</th>
-              <th>Acciones</th>
+              <th className="text-center">Acciones 
+                <button className="btn btn-sm btn-outline-secondary mx-2 pr-1" onClick={exportarExcel} >
+                  <i className="bi bi-file-earmark-excel m-2"></i>
+                  Exportar 
+                </button>
+              </th>
             </tr>
           </thead>
 
@@ -218,7 +402,7 @@ function ConnectionsAdmin({ token }) {
               <tr><td colSpan="7">Cargando...</td></tr>
             )}
 
-            {!loading && data.map((row) => (
+            {!loading && dataFiltrada.map((row) => (
               <tr key={row.id}>
                 <td>{row.name}</td>
                 <td>{row.codLocal}</td>

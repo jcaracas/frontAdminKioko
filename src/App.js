@@ -122,20 +122,26 @@ function App() {
   useAuthGuard();
 
   return (
-    <>
-      {!token ? (
-        <LoginForm onLogin={handleLogin} />
-      ) : (
-        <>
-          <Navbar user={user} onLogout={handleLogout} token={token} />
-          <div className="container mt-4">
-            <Layout token={token} user={user} />
-          </div>
-          <FooterContent />
-        </>
-      )}
-    </>
-  );
+  <>
+    {!token ? (
+      <LoginForm onLogin={handleLogin} />
+    ) : (
+      <div className="d-flex flex-column min-vh-100">
+        <Navbar
+          user={user}
+          onLogout={handleLogout}
+          token={token}
+        />
+
+        <main className="container mt-4 flex-grow-1">
+          <Layout token={token} user={user} />
+        </main>
+
+        <FooterContent />
+      </div>
+    )}
+  </>
+);
 }
 
 export default App;

@@ -8,6 +8,7 @@ import Actualizaciones from "./Actualizaciones";
 import { useLocation } from "react-router-dom";
 import DashboardAgotados from "../pages/DashboardAgotados";
 import ConnectionsAdmin from "./ConnectionsAdmin";
+import ScheduledTasks from "../scheduledTasks/ScheduledTasks";
 
 function AdminDashboard({ token }) {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
@@ -29,15 +30,20 @@ function AdminDashboard({ token }) {
     { key: "ventas", label: "Ventas" },
     { key: "actualizaciones", label: "Actualización POS" },
     { key: "agotados", label: "Agotados" },
-    { key: "connections", label: "Locales" }
+    { key: "connections", label: "Locales" },
+    { key: "scheduled-tasks", label: "Tareas" },
   ];
 
   useEffect(() => {
     if (location.state?.tab) {
-      setActiveTab(location.state.tab);
-    } else {
-      setActiveTab("users");
-    } 
+      const existe = tabs.some(t => t.key === location.state.tab);
+
+      if (existe) {
+        setActiveTab(location.state.tab);
+      } else {
+        setActiveTab("users");
+      }
+    }
   }, [location.state]);
 
   /* detectar tamaño */
@@ -101,6 +107,7 @@ function AdminDashboard({ token }) {
       case "actualizaciones": return <Actualizaciones token={token} />;
       case "agotados": return <DashboardAgotados token={token} />;
       case "connections": return <ConnectionsAdmin token={token} />;
+      case "scheduled-tasks": return <ScheduledTasks token={token} />;
       default: return null;
     }
   };

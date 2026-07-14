@@ -66,10 +66,17 @@ function MyNavbar({ user, onLogout, token }) {
       }
 
       cargarNotificaciones(); // 🔥 refresca la lista después de marcar como leído
-      // 🚀 redirigir
-      navigate("/admin", {
-        state: { tab: "ultima-venta" }
-      });
+      // Redirigir si existe una URL
+      if (notif.url?.startsWith("/")) {
+        navigate(notif.url);
+      } else {
+        navigate("/admin", {
+          state: {
+            tab: notif.url
+          }
+        });
+      }
+
       setShow(false);
 
     } catch (err) {
