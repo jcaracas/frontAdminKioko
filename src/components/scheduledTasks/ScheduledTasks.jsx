@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Table, Badge, Modal } from "react-bootstrap";
+import { Badge } from "react-bootstrap";
 import TaskModal from "./TaskModal";
 import TaskResultsModal from "./TaskResultsModal";
 import { API_BASE_URL } from "../../config";
@@ -15,6 +15,10 @@ function ScheduledTasks({token}) {
 
   const [showResults, setShowResults] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
+
+  const [runningTaskId, setRunningTaskId] = useState(null);
+  const [runningType, setRunningType] = useState(null); // "run" | "retry"
+  const [progress, setProgress] = useState(0);
 
 
    const cargarTareas = async () => { 
@@ -46,6 +50,10 @@ function ScheduledTasks({token}) {
 
 
   const ejecutarTarea = async(id)=>{
+    setRunningTaskId(id);
+    setRunningType("run");
+    setProgress(0);
+
     try{
       const res = await fetch(
         `${API_BASE_URL}/scheduled-tasks/${id}/run`,
@@ -61,6 +69,9 @@ function ScheduledTasks({token}) {
         throw new Error("Error ejecutando tarea");
       }
       alert("✅ Tarea ejecutada correctamente");
+      setRunningTaskId(null);
+      setRunningType(null);
+      setProgress(0);
       cargarTareas();
 
     }catch(err){
@@ -71,6 +82,9 @@ function ScheduledTasks({token}) {
 
 
   const reintentar = async(id)=>{
+    setRunningTaskId(id);
+    setRunningType("run");
+    setProgress(0);
     try{
       const res = await fetch(`${API_BASE_URL}/scheduled-tasks/${id}/retry`,{
           method:"POST",
@@ -84,6 +98,9 @@ function ScheduledTasks({token}) {
         throw new Error("Error reintentando tarea");
       }
       alert("✅ Reintento ejecutado");
+      setRunningTaskId(null);
+      setRunningType(null);
+      setProgress(0);
       cargarTareas();
 
     }catch(err){
@@ -166,8 +183,17 @@ function ScheduledTasks({token}) {
                     <td className="text-center">
                       <div className="d-flex justify-content-center align-items-center">
                         <div className="d-none d-md-flex gap-2">  
-                          <button size="sm" className="btn btn-sm btn-primary me-1" title="Ejecutar tarea" onClick={()=>ejecutarTarea(task.id)} >
-                            <i className="bi bi-play-fill"></i></button>
+                          <button size="sm" className="btn btn-sm btn-primary me-1" title="Ejecutar tarea" 
+                            onClick={()=>ejecutarTarea(task.id)} disabled={runningTaskId === task.id} >
+                              {runningTaskId === task.id && runningType === "run" ? (
+                                  <>
+                                      <span className="spinner-border spinner-border-sm me-2" role="status"/>
+                                      Ejecutando...
+                                  </>
+                              ) : (
+                                  <i className="bi bi-play-fill"></i>
+                              )}
+                            </button>
                           <button size="sm" className="btn btn-sm btn-secondary me-1" title="Editar tarea" onClick={()=>{
                             setEditTask(task);
                             setShowModal(true);
@@ -176,8 +202,18 @@ function ScheduledTasks({token}) {
                             setSelectedTask(task);
                             setShowResults(true);
                           }}>📋</button>
-                          <button size="sm" className="btn btn-sm btn-danger me-1" title="Reintentar tarea" onClick={()=>reintentar(task.id)} >
-                            <i className="bi bi-arrow-clockwise"></i></button>
+                          <button size="sm" className="btn btn-sm btn-danger me-1" title="Reintentar tarea" 
+                          onClick={()=>reintentar(task.id)} disabled={runningTaskId === task.id}>
+                            {runningTaskId === task.id && runningType === "retry" ? (
+                                  <>
+                                      <span className="spinner-border spinner-border-sm me-2" role="status"/>
+                                      Reintentando...
+                                  </>
+                              ) : (
+                                  <i className="bi bi-arrow-clockwise"></i>
+                              )}
+                                                       
+                            </button>
                           <button title={task.activo ? "Desactivar Tarea" : "Activar Tarea"} 
                                     className={`btn btn-sm ${ task.activo
                                       ? "btn-success "

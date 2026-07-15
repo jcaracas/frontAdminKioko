@@ -43,33 +43,17 @@ export default function TaskResultsModal({ show,onClose,task,token }) {
 
   return (
 
-    <Modal
-      show={show}
-      onHide={onClose}
-      size="xl"
-      centered
-    >
-
+    <Modal show={show} onHide={onClose} size="xl" centered >
       <Modal.Header closeButton>
-
         <Modal.Title>
-
           Resultado de la tarea
-
         </Modal.Title>
-
       </Modal.Header>
-
       <Modal.Body>
-
         {task && (
-
           <Alert variant="light">
-
             <strong>Tarea:</strong> {task.nombre}
-
             <br />
-
             <strong>Última ejecución:</strong>{" "}
             {task.ultima_ejecucion || "Sin ejecutar"}
 
@@ -79,129 +63,54 @@ export default function TaskResultsModal({ show,onClose,task,token }) {
 
         <div className="mb-3">
 
-          <Badge bg="success" className="me-2">
-
-            OK: {ok}
-
-          </Badge>
-
-          <Badge bg="danger">
-
-            Error: {error}
-
-          </Badge>
+          <Badge bg="success" className="me-2"> OK: {ok} </Badge>
+          <Badge bg="danger"> Error: {error} </Badge>
 
         </div>
 
         {loading ? (
-
-          <div className="text-center py-5">
-
-            <Spinner animation="border" />
-
-          </div>
-
-        ) : resultados.length === 0 ? (
-
+          <div className="text-center py-5"> <Spinner animation="border" /> </div>
+          ) : resultados.length === 0 ? (
           <Alert variant="warning">
-
             No existen resultados para mostrar.
-
           </Alert>
-
         ) : (
-
-          <Table
-            striped
-            bordered
-            hover
-            responsive
-          >
-
-            <thead>
-
-              <tr>
-
-                <th>Local</th>
-
-                <th>Nombre</th>
-
-                <th>Estado</th>
-
-                <th>Mensaje</th>
-
-                <th>Fecha</th>
-
-              </tr>
-
-            </thead>
-
-            <tbody>
-
-              {resultados.map((r, index) => (
-                
-
-                <tr key={index}>
-
-                  <td>{r.codLocal}</td>
-
-                  <td>{r.nombre}</td>
-
-                  <td>
-
-                    {r.estado === "OK" ? (
-
-                      <Badge bg="success">
-
-                        OK
-
-                      </Badge>
-
-                    ) : (
-
-                      <Badge bg="danger">
-
-                        ERROR
-
-                      </Badge>
-
-                    )}
-
-                  </td>
-
-                  <td>{r.mensaje}</td>
-
-                  <td>
-  {new Date(r.created_at).toLocaleString("es-CL")}
-</td>
-
+          <div style={{ minHeight: 200, overflowY: "auto",maxHeight: 300 }}>
+            <Table striped bordered hover responsive >
+              <thead>
+                <tr>
+                  <th>Local</th>
+                  <th>Nombre</th>
+                  <th>Estado</th>
+                  <th>Mensaje</th>
+                  <th>Fecha</th>
                 </tr>
-
-              ))}
-
-            </tbody>
-
-          </Table>
-
+              </thead>
+              <tbody>
+                {resultados.map((r, index) => (                
+                  <tr key={index}>
+                    <td>{r.codLocal}</td>
+                    <td>{r.nombre}</td>
+                    <td>
+                      {r.estado === "OK" ? (
+                        <Badge bg="success"> OK </Badge>
+                      ) : (
+                        <Badge bg="danger"> ERROR </Badge>
+                      )}
+                    </td>
+                    <td>{r.mensaje}</td>
+                    <td> {new Date(r.created_at).toLocaleString("es-CL")} </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
         )}
-
       </Modal.Body>
-
       <Modal.Footer>
-
-        <Button
-          variant="secondary"
-          onClick={onClose}
-        >
-
-          Cerrar
-
-        </Button>
-
+        <Button variant="secondary" onClick={onClose} > Cerrar </Button>
       </Modal.Footer>
-
     </Modal>
-
   );
 
 }
